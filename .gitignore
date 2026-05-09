@@ -1,0 +1,26 @@
+# LostNova — Root Gitignore
+
+# Secrets
+**/.env
+!**/.env.example
+
+# Node
+**/node_modules/
+**/npm-debug.log*
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/.vercel
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/

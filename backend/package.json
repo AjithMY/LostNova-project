@@ -1,0 +1,52 @@
+{
+  "name": "lostnova-backend",
+  "version": "1.0.0",
+  "description": "LostNova AI Lost & Found — Express REST API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "db:migrate": "mysql -u root -p lostnova < schema.sql"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ext": "js,json",
+    "ignore": [
+      "node_modules"
+    ],
+    "delay": "500"
+  },
+  "keywords": [
+    "lost",
+    "found",
+    "ai",
+    "nodejs",
+    "express"
+  ],
+  "author": "LostNova Team",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.1",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.3",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.7",
+    "socket.io": "^4.8.3",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
