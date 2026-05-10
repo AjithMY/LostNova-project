@@ -76,7 +76,7 @@ export default function Sidebar() {
           </div>
         </Link>
         <p className="text-[10px] text-[#3c494e] font-bold tracking-widest uppercase mt-2 ml-11">
-          Retrieval Network v2
+          AI-Powered Platform
         </p>
       </div>
 

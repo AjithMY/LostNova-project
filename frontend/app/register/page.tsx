@@ -43,15 +43,15 @@ export default function RegisterPage() {
 
         {/* Left: Brand panel */}
         <section className="hidden md:flex md:w-1/2 relative bg-[#0c0f0f] items-center justify-center p-16 overflow-hidden border-r border-white/5">
-          <div className="absolute w-[600px] h-[600px] rounded-full blur-[140px] bg-[#6e208c]/20 top-[-100px] left-[-200px] animate-nebula-slow z-0" />
-          <div className="absolute w-[500px] h-[500px] rounded-full blur-[120px] bg-[#00d2ff]/15 bottom-[-100px] right-[-100px] animate-nebula-slower z-0" />
+          <div className="absolute w-[600px] h-[600px] rounded-full blur-[140px] bg-[#6e208c]/15 top-[-100px] left-[-200px] z-0" />
+          <div className="absolute w-[500px] h-[500px] rounded-full blur-[120px] bg-[#00d2ff]/10 bottom-[-100px] right-[-100px] z-0" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent,rgba(12,15,15,0.9))] z-10" />
           <div className="relative z-20 text-center max-w-sm">
             <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-[#121414]/50 border border-white/10 flex items-center justify-center shadow-[0_0_40px_rgba(110,32,140,0.3)]">
               <span className="material-symbols-outlined text-[#edb1ff] icon-fill text-4xl">hub</span>
             </div>
             <h1 className="text-5xl font-extrabold text-[#edb1ff] tracking-tighter mb-4">Join LostNova</h1>
-            <p className="text-[#bbc9cf] leading-relaxed">Register your operator node and plug into the world's most advanced asset recovery network.</p>
+            <p className="text-[#bbc9cf] leading-relaxed">Create your account and join the AI-powered lost and found recovery network.</p>
             <div className="mt-10 space-y-4 text-left">
               {[
                 { icon: "auto_awesome", text: "AI-powered item matching in real-time" },
@@ -79,7 +79,7 @@ export default function RegisterPage() {
 
             <header className="mb-8">
               <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
-              <p className="text-[#bbc9cf] text-sm">Set up your operator credentials to begin.</p>
+              <p className="text-[#bbc9cf] text-sm">Fill in your details to get started.</p>
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -149,9 +149,9 @@ export default function RegisterPage() {
                 className="w-full mt-2 bg-gradient-to-r from-[#edb1ff] to-[#a5e7ff] text-[#0c0f0f] font-bold py-3.5 rounded-2xl shadow-[0_0_24px_rgba(237,177,255,0.25)] hover:shadow-[0_0_36px_rgba(237,177,255,0.4)] hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
-                  <><span className="material-symbols-outlined animate-spin text-lg">progress_activity</span> Creating Node…</>
+                  <><span className="material-symbols-outlined animate-spin text-lg">progress_activity</span> Creating Account…</>
                 ) : (
-                  <>Establish Node <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span></>
+                  <>Create Account <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span></>
                 )}
               </button>
             </form>

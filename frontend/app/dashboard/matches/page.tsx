@@ -106,7 +106,7 @@ function MatchCard({ m, userId }: { m: any; userId?: number }) {
 
   return (
     <>
-      <article className={`glass-panel rounded-3xl overflow-hidden group transition-all duration-300 hover:border-${tier.color.replace("text-","")}/40 border border-white/8 relative`}>
+      <article className="glass-panel rounded-3xl overflow-hidden transition-all duration-300 border border-white/8 relative hover:border-white/15">
         {/* Score badge */}
         <div className={`absolute top-4 right-4 z-10 px-3 py-1.5 ${tier.bg} backdrop-blur-md ${tier.color} border ${tier.border} rounded-full text-[11px] font-bold flex items-center gap-1.5`}>
           <span className="material-symbols-outlined text-xs">target</span>
@@ -117,7 +117,7 @@ function MatchCard({ m, userId }: { m: any; userId?: number }) {
         {/* Confidence bar */}
         <div className="h-1 bg-white/5 w-full">
           <div
-            className={`h-full ${tier.bar} transition-all duration-700`}
+            className={`h-full ${tier.bar} transition-all duration-500`}
             style={{ width: `${score}%` }}
           />
         </div>
@@ -149,7 +149,7 @@ function MatchCard({ m, userId }: { m: any; userId?: number }) {
             </div>
           </div>
 
-          {/* Similarity bridge */}
+          {/* AI Match Bridge */}
           <div className="flex items-center gap-2 mb-3">
             <div className="flex-1 h-px bg-white/5" />
             <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${tier.bg} border ${tier.border} text-[10px] font-bold ${tier.color}`}>
@@ -160,7 +160,7 @@ function MatchCard({ m, userId }: { m: any; userId?: number }) {
           </div>
 
           {/* Found item */}
-          <div className="mb-4 p-4 rounded-xl bg-primary/5 border border-primary/15">
+          <div className="mb-3 p-4 rounded-xl bg-primary/5 border border-primary/15">
             <p className="text-[9px] font-bold tracking-widest text-primary uppercase mb-1.5 flex items-center gap-1">
               <span className="material-symbols-outlined text-xs">inventory_2</span> Found Item
             </p>
@@ -185,6 +185,17 @@ function MatchCard({ m, userId }: { m: any; userId?: number }) {
             </div>
           </div>
 
+          {/* AI Explanation */}
+          {m.ai_explanation && (
+            <div className="mb-3 p-3 rounded-xl bg-[#a5e7ff]/[0.04] border border-[#a5e7ff]/15">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <span className="material-symbols-outlined text-xs text-[#a5e7ff]">psychology</span>
+                <span className="text-[10px] font-bold tracking-widest text-[#a5e7ff] uppercase">Gemini AI Analysis</span>
+              </div>
+              <p className="text-[#bbc9cf] text-xs leading-relaxed">{m.ai_explanation}</p>
+            </div>
+          )}
+
           {/* Footer */}
           <div className="flex items-center justify-between gap-3 pt-3 border-t border-white/5">
             <div className="flex items-center gap-2">
@@ -205,6 +216,13 @@ function MatchCard({ m, userId }: { m: any; userId?: number }) {
                   className="px-3 py-1.5 rounded-lg bg-[#ffb4ab]/10 border border-[#ffb4ab]/25 text-[#ffb4ab] text-xs font-semibold hover:bg-[#ffb4ab]/20 transition-all disabled:opacity-50"
                 >
                   Not Mine
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  disabled={confirmMut.isPending}
+                  className="px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/25 text-green-400 text-xs font-semibold hover:bg-green-500/20 transition-all disabled:opacity-50"
+                >
+                  Confirm
                 </button>
                 {isLostOwner && !alreadyClaimed && (
                   <button
@@ -265,12 +283,12 @@ export default function MatchesPage() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-4xl font-extrabold text-[#e2e2e2] tracking-tighter">AI Match Engine</h1>
-            <span className="px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-primary text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 shadow-[0_0_10px_rgba(71,214,255,0.2)]">
-              <span className="material-symbols-outlined text-sm">bolt</span> Live
+            <span className="px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-primary text-[11px] font-bold tracking-widest uppercase flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm">auto_awesome</span> Gemini
             </span>
           </div>
           <p className="text-[#bbc9cf] text-sm">
-            Intelligent matches between lost and found items. {counts.pending > 0 && (
+            Intelligent matches powered by Google Gemini AI. {counts.pending > 0 && (
               <span className="text-[#a5e7ff] font-semibold">{counts.pending} pending review.</span>
             )}
           </p>

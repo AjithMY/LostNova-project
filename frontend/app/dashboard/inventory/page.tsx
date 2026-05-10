@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useCallback } from "react";
 import { useAllItems, useDeleteItem } from "@/lib/hooks";
+import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/Toast";
 import { formatDate, useDebounce } from "@/lib/utils";
 
@@ -40,6 +41,8 @@ export default function InventoryPage() {
     Object.keys(searchParams).length ? searchParams : undefined
   );
   const deleteMut = useDeleteItem();
+  const user = useAuthStore(s => s.user);
+  const isAdmin = user?.role === "admin";
 
   const filtered = (items ?? []).filter((i: any) => {
     if (typeFilter !== "all" && i._type !== typeFilter) return false;
@@ -216,13 +219,17 @@ export default function InventoryPage() {
                     </span>
                   </td>
                   <td className="text-right pr-6">
-                    <button
-                      onClick={() => setTarget({ id: item.id, type: item._type, title: item.title })}
-                      className="text-[#859399] hover:text-[#ffb4ab] transition-colors"
-                      title="Delete item"
-                    >
-                      <span className="material-symbols-outlined text-lg">delete</span>
-                    </button>
+                    {(isAdmin || item.user_id === user?.id) ? (
+                      <button
+                        onClick={() => setTarget({ id: item.id, type: item._type, title: item.title })}
+                        className="text-[#859399] hover:text-[#ffb4ab] transition-colors"
+                        title="Delete item"
+                      >
+                        <span className="material-symbols-outlined text-lg">delete</span>
+                      </button>
+                    ) : (
+                      <span className="text-[#3c494e] text-xs italic">—</span>
+                    )}
                   </td>
                 </tr>
               ))}

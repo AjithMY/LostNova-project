@@ -8,6 +8,7 @@ router.get("/", auth, async (req, res, next) => {
   try {
     const [rows] = await db.query(
       `SELECT m.*,
+              m.ai_explanation,
               m.matched_at AS created_at,
               li.id        AS lost_item_id_ref,
               li.title     AS lost_title,
@@ -48,6 +49,7 @@ router.get("/all", auth, async (req, res, next) => {
     if (req.user.role !== "admin") return res.status(403).json({ error: "Admin only" });
     const [rows] = await db.query(
       `SELECT m.*,
+              m.ai_explanation,
               li.title AS lost_title,  li.category AS lost_category,
               fi.title AS found_title, fi.category AS found_category,
               ul.name AS lost_reporter_name,

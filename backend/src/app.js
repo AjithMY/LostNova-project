@@ -120,6 +120,8 @@ server.listen(PORT, () => {
 
   // ── AI Matching Engine (cron) ──────────────────────────
   if (process.env.NODE_ENV !== "test") {
+    const { initGemini } = require("./services/geminiService");
+    initGemini();
     const { setIO } = require("./services/matchingEngine");
     setIO(io);
     console.log("   Match Engine :  ✓ Active (every 5 min)");

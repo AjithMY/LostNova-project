@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS matches (
   lost_item_id   INT            NOT NULL,
   found_item_id  INT            NOT NULL,
   score          DECIMAL(5,2)   NOT NULL DEFAULT 0,
+  ai_explanation TEXT,
   status         ENUM('pending','confirmed','rejected') NOT NULL DEFAULT 'pending',
   matched_at     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),

@@ -50,8 +50,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-8 md:p-14 max-w-[1100px] mx-auto w-full">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+    <div className="p-8 md:p-14 max-w-[1100px] mx-auto w-full relative">
 
       <header className="mb-12">
         <h1 className="text-[42px] font-extrabold text-[#e2e2e2] tracking-tighter mb-1">Settings</h1>
