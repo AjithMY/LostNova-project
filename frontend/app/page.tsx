@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import React from "react";
+import CinematicHero from "@/components/CinematicHero";
 
 /* ── Navbar ────────────────────────────────────────────── */
 function Navbar() {
@@ -31,67 +32,71 @@ export default function LandingPage() {
   return (
     <main style={{ background:"#000",minHeight:"100vh",fontFamily:"'Inter',sans-serif",color:"#e2e2e2",overflow:"hidden" }}>
 
-      {/* ── Ambient background (lightweight) ── */}
+      {/* ── Cinematic Animated Background ── */}
       <div style={{ position:"fixed",inset:0,zIndex:0 }}>
-        <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 80% 60% at 65% 50%,rgba(30,10,60,0.6) 0%,#000 70%)" }} />
-        <div style={{ position:"absolute",top:"-10%",left:"-5%",width:"50vw",height:"50vw",borderRadius:"50%",background:"radial-gradient(circle,rgba(110,32,160,0.12) 0%,transparent 65%)",filter:"blur(40px)" }} />
-        <div style={{ position:"absolute",bottom:"-15%",right:"-5%",width:"55vw",height:"55vw",borderRadius:"50%",background:"radial-gradient(circle,rgba(0,160,220,0.1) 0%,transparent 65%)",filter:"blur(50px)" }} />
-        <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(165,231,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(165,231,255,0.02) 1px,transparent 1px)",backgroundSize:"60px 60px" }} />
+        <CinematicHero />
       </div>
 
       <Navbar />
 
       {/* ── HERO ────────────────────────────────────────── */}
       <section style={{ position:"relative",zIndex:20,minHeight:"100vh",display:"flex",alignItems:"center" }}>
-        <div style={{ width:"100%",maxWidth:1280,margin:"0 auto",padding:"0 48px",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center" }}>
+        <div style={{ width:"100%",maxWidth:1400,margin:"0 auto",padding:"0 48px",display:"grid",gridTemplateColumns:"1fr 1fr",alignItems:"center",minHeight:"100vh" }}>
 
-          {/* Status pill */}
-          <div style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"6px 14px",borderRadius:999,background:"rgba(165,231,255,0.06)",border:"1px solid rgba(165,231,255,0.15)",marginBottom:32,marginTop:80 }}>
-            <span style={{ width:6,height:6,borderRadius:"50%",background:"#a5e7ff",boxShadow:"0 0 8px #a5e7ff",display:"inline-block" }} />
-            <span style={{ fontSize:11,fontWeight:700,letterSpacing:"0.14em",color:"#a5e7ff",textTransform:"uppercase" }}>Gemini AI-Powered Matching · Live</span>
+          {/* LEFT — Text content */}
+          <div style={{ display:"flex",flexDirection:"column",justifyContent:"center",paddingTop:80,paddingRight:24 }}>
+
+            {/* Status pill */}
+            <div style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"6px 14px",borderRadius:999,background:"rgba(0,160,255,0.08)",border:"1px solid rgba(0,160,255,0.2)",marginBottom:32,width:"fit-content",backdropFilter:"blur(10px)" }}>
+              <span style={{ width:7,height:7,borderRadius:"50%",background:"#00c8ff",boxShadow:"0 0 10px #00c8ff",display:"inline-block",animation:"pulse-dot 2s ease-in-out infinite" }} />
+              <span style={{ fontSize:11,fontWeight:700,letterSpacing:"0.14em",color:"#00c8ff",textTransform:"uppercase" }}>Gemini AI-Powered · Live</span>
+            </div>
+
+            {/* Heading */}
+            <h1 style={{ fontSize:"clamp(38px,5.5vw,78px)",fontWeight:900,lineHeight:1.0,letterSpacing:"-0.04em",marginBottom:24,margin:"0 0 24px" }}>
+              <span style={{ display:"block",color:"#ffffff",textShadow:"0 0 40px rgba(0,100,255,0.2)" }}>Lost Something?</span>
+              <span style={{ display:"block",background:"linear-gradient(120deg,#00c8ff 0%,#0070ff 50%,#a0c4ff 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:"drop-shadow(0 0 20px rgba(0,150,255,0.4))" }}>AI Will Find It.</span>
+            </h1>
+
+            {/* Subtitle */}
+            <p style={{ fontSize:16,lineHeight:1.75,color:"rgba(160,196,255,0.75)",maxWidth:480,marginBottom:40 }}>
+              LostNova uses Google Gemini AI to semantically match lost items with found reports.
+              Report your item and our engine does the rest — fast, accurate, reliable.
+            </p>
+
+            {/* CTAs */}
+            <div style={{ display:"flex",gap:14,flexWrap:"wrap",marginBottom:56 }}>
+              <Link href="/register">
+                <button style={{ display:"flex",alignItems:"center",gap:8,padding:"14px 32px",borderRadius:14,fontSize:15,fontWeight:700,color:"#000",background:"linear-gradient(135deg,#00c8ff,#0060ff)",boxShadow:"0 0 32px rgba(0,160,255,0.4),0 4px 24px rgba(0,100,255,0.3)",cursor:"pointer",border:"none",transition:"all .3s" }}>
+                  <span className="material-symbols-outlined icon-fill" style={{ fontSize:18 }}>person_add</span>
+                  Get Started Free
+                </button>
+              </Link>
+              <Link href="/login">
+                <button style={{ display:"flex",alignItems:"center",gap:8,padding:"14px 28px",borderRadius:14,fontSize:15,fontWeight:600,color:"#a0c4ff",background:"rgba(0,80,200,0.08)",border:"1px solid rgba(0,120,255,0.2)",cursor:"pointer",backdropFilter:"blur(10px)",transition:"all .3s" }}>
+                  <span className="material-symbols-outlined" style={{ fontSize:18 }}>login</span>
+                  Sign In
+                </button>
+              </Link>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display:"flex",gap:40,flexWrap:"wrap" }}>
+              {[
+                { val:"AI-Powered", label:"Gemini Matching" },
+                { val:"Real-time", label:"Instant Alerts" },
+                { val:"Secure", label:"JWT Auth" },
+              ].map(s => (
+                <div key={s.label}>
+                  <div style={{ fontSize:22,fontWeight:900,letterSpacing:"-0.03em",background:"linear-gradient(135deg,#fff,rgba(0,200,255,0.9))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>{s.val}</div>
+                  <div style={{ fontSize:10,fontWeight:600,letterSpacing:"0.12em",color:"rgba(0,160,255,0.6)",textTransform:"uppercase",marginTop:2 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Heading */}
-          <h1 style={{ fontSize:"clamp(48px,7vw,88px)",fontWeight:900,lineHeight:1,letterSpacing:"-0.04em",marginBottom:28 }}>
-            <span style={{ display:"block",color:"#fff" }}>Lost Something?</span>
-            <span style={{ display:"block",background:"linear-gradient(135deg,#a5e7ff 0%,#edb1ff 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>AI Will Find It.</span>
-          </h1>
-
-          {/* Subtitle */}
-          <p style={{ fontSize:17,lineHeight:1.65,color:"rgba(187,201,207,0.8)",maxWidth:560,marginBottom:44 }}>
-            LostNova uses Google Gemini AI to semantically match lost items with found reports. 
-            Report your item, and our AI matching engine does the rest — fast, accurate, and reliable.
-          </p>
-
-          {/* CTAs */}
-          <div style={{ display:"flex",gap:14,flexWrap:"wrap",justifyContent:"center",marginBottom:64 }}>
-            <Link href="/register">
-              <button style={{ display:"flex",alignItems:"center",gap:8,padding:"14px 32px",borderRadius:16,fontSize:15,fontWeight:700,color:"#0c0f0f",background:"linear-gradient(135deg,#a5e7ff,#edb1ff)",boxShadow:"0 0 32px rgba(165,231,255,0.3)",cursor:"pointer",border:"none",transition:"all .3s" }}>
-                <span className="material-symbols-outlined icon-fill" style={{ fontSize:18 }}>person_add</span>
-                Get Started Free
-              </button>
-            </Link>
-            <Link href="/login">
-              <button style={{ display:"flex",alignItems:"center",gap:8,padding:"14px 28px",borderRadius:16,fontSize:15,fontWeight:600,color:"#bbc9cf",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",cursor:"pointer",backdropFilter:"blur(10px)",transition:"all .3s" }}>
-                <span className="material-symbols-outlined" style={{ fontSize:18 }}>login</span>
-                Sign In
-              </button>
-            </Link>
-          </div>
-
-          {/* Stats */}
-          <div style={{ display:"flex",gap:48,flexWrap:"wrap",justifyContent:"center" }}>
-            {[
-              { val:"AI-Powered", label:"Gemini Matching" },
-              { val:"Real-time", label:"Instant Alerts" },
-              { val:"Secure", label:"JWT + Role-Based" },
-            ].map(s => (
-              <div key={s.label}>
-                <div style={{ fontSize:24,fontWeight:900,letterSpacing:"-0.03em",background:"linear-gradient(135deg,#fff,rgba(165,231,255,0.9))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>{s.val}</div>
-                <div style={{ fontSize:11,fontWeight:600,letterSpacing:"0.1em",color:"#859399",textTransform:"uppercase",marginTop:2 }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
+          {/* RIGHT — pure negative space; canvas fills the fixed bg */}
+          <div style={{ height:"100vh" }} />
         </div>
       </section>
 

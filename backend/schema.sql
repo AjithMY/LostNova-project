@@ -125,4 +125,5 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 -- ──────────────────── SEED: Admin user ────────────────────
 -- Password: Admin@1234 (bcrypt hash)
 INSERT IGNORE INTO users (name, email, password_hash, role, is_verified)
-VALUES ('Admin', 'admin@lostnova.ai', '$2a$12$examplehashreplacebeforeproduction', 'admin', TRUE);
+VALUES ('Admin', 'admin@lostnova.ai', '$2b$12$HsZTkiYx3LxWeogaFiFjcuC7OmOf.kZOj.BNWHI7tNbyr5cVCECya', 'admin', TRUE);
+-- Login: admin@lostnova.ai / Admin@1234

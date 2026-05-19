@@ -80,7 +80,7 @@ router.put("/:id", auth, role("admin"), async (req, res, next) => {
       const [match] = await db.query("SELECT * FROM matches WHERE id = ?", [claim.match_id]);
       if (match.length) {
         await db.query("UPDATE lost_items  SET status = 'recovered' WHERE id = ?", [match[0].lost_item_id]);
-        await db.query("UPDATE found_items SET status = 'recovered' WHERE id = ?", [match[0].found_item_id]);
+        await db.query("UPDATE found_items SET status = 'claimed'   WHERE id = ?", [match[0].found_item_id]);
         // Notify claimant
         await db.query(
           "INSERT INTO notifications (user_id, type, title, body) VALUES (?,?,?,?)",

@@ -272,7 +272,7 @@ async function runMatchingEngine() {
 
     // Log engine run
     await db.query(
-      `INSERT INTO activity_logs (action, entity_type, entity_id) VALUES ('MATCH_ENGINE_RUN', 'system', 0)`
+      `INSERT INTO activity_logs (action, entity_type, entity_id) VALUES ('MATCH_ENGINE_RUN', 'system', NULL)`
     );
 
     if ((newMatches > 0 || updatedMatches > 0) && _io) {
