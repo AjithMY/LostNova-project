@@ -55,16 +55,19 @@ export default function CinematicHero() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Minimal floating particles (slower speed, calm)
-    const particles: Particle[] = Array.from({ length: 40 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.08,
-      vy: (Math.random() - 0.5) * 0.08,
-      r: Math.random() * 1.2 + 0.3,
-      a: Math.random(),
-      va: (Math.random() - 0.5) * 0.003,
-    }));
+    // Floating particles (tiny glowing dust + slow drift particles)
+    const particles: Particle[] = Array.from({ length: 60 }, (_, idx) => {
+      const isDust = idx % 2 === 0;
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * (isDust ? 0.05 : 0.15),
+        vy: (Math.random() - 0.5) * (isDust ? 0.05 : 0.15),
+        r: Math.random() * (isDust ? 0.7 : 1.4) + 0.3,
+        a: Math.random(),
+        va: (Math.random() - 0.5) * (isDust ? 0.002 : 0.004),
+      };
+    });
 
     // Holographic panels with slow breathing motion
     const panels: HoloPanel[] = [
@@ -86,6 +89,9 @@ export default function CinematicHero() {
       ctx.fillStyle = "#020204";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Slow breathing glow factor
+      const breathe = 0.85 + Math.sin(t * 0.0008) * 0.15;
+
       // Upper Section: Active cinematic ambient lights (subtle movement)
       const topGlowX = canvas.width * (0.65 + Math.sin(t * 0.0005) * 0.08) + mouseSmooth.x * 0.15;
       const topGlowY = canvas.height * (0.25 + Math.cos(t * 0.0003) * 0.04) + mouseSmooth.y * 0.15;
@@ -93,8 +99,8 @@ export default function CinematicHero() {
         topGlowX, topGlowY, 0,
         topGlowX, topGlowY, canvas.width * 0.45
       );
-      topGlow.addColorStop(0, "rgba(0, 140, 255, 0.07)");
-      topGlow.addColorStop(0.6, "rgba(0, 70, 180, 0.02)");
+      topGlow.addColorStop(0, `rgba(0, 140, 255, ${0.07 * breathe})`);
+      topGlow.addColorStop(0.6, `rgba(0, 70, 180, ${0.02 * breathe})`);
       topGlow.addColorStop(1, "transparent");
       ctx.fillStyle = topGlow;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -105,11 +111,53 @@ export default function CinematicHero() {
         canvas.width * 0.7, bottomGlowY, 0,
         canvas.width * 0.7, bottomGlowY, canvas.width * 0.35
       );
-      bottomGlow.addColorStop(0, "rgba(0, 80, 180, 0.03)");
-      bottomGlow.addColorStop(0.5, "rgba(0, 40, 100, 0.008)");
+      bottomGlow.addColorStop(0, `rgba(0, 80, 180, ${0.03 * breathe})`);
+      bottomGlow.addColorStop(0.5, `rgba(0, 40, 100, ${0.008 * breathe})`);
       bottomGlow.addColorStop(1, "transparent");
       ctx.fillStyle = bottomGlow;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
+
+    const drawAbstractCurves = () => {
+      // Minimal abstract curved lines in the background
+      ctx.save();
+      ctx.lineWidth = 1.5;
+
+      // Curve 1
+      ctx.beginPath();
+      const offset1 = Math.sin(t * 0.0002) * 30;
+      ctx.moveTo(canvas.width * 0.35 + mouseSmooth.x * 0.1, -100);
+      ctx.quadraticCurveTo(
+        canvas.width * 0.55 + offset1 + mouseSmooth.x * 0.15,
+        canvas.height * 0.5,
+        canvas.width * 0.3 + mouseSmooth.x * 0.1,
+        canvas.height + 100
+      );
+      const g1 = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      g1.addColorStop(0, "rgba(0, 120, 255, 0.0)");
+      g1.addColorStop(0.5, "rgba(0, 150, 255, 0.03)");
+      g1.addColorStop(1, "rgba(0, 80, 200, 0.0)");
+      ctx.strokeStyle = g1;
+      ctx.stroke();
+
+      // Curve 2
+      ctx.beginPath();
+      const offset2 = Math.cos(t * 0.00025) * 40;
+      ctx.moveTo(canvas.width * 0.9 + mouseSmooth.x * 0.08, -100);
+      ctx.quadraticCurveTo(
+        canvas.width * 0.65 + offset2 + mouseSmooth.x * 0.12,
+        canvas.height * 0.45,
+        canvas.width * 0.85 + mouseSmooth.x * 0.08,
+        canvas.height + 100
+      );
+      const g2 = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      g2.addColorStop(0, "rgba(0, 80, 200, 0.0)");
+      g2.addColorStop(0.4, "rgba(0, 180, 255, 0.02)");
+      g2.addColorStop(1, "rgba(0, 120, 255, 0.0)");
+      ctx.strokeStyle = g2;
+      ctx.stroke();
+
+      ctx.restore();
     };
 
     const drawGrid = () => {
@@ -335,7 +383,7 @@ export default function CinematicHero() {
 
     const drawWallet = () => {
       const float = Math.sin(t * 0.00075 + 2) * 4;
-      const cx = canvas.width * 0.62 + mouseSmooth.x * 0.43;
+      const cx = canvas.width * 0.61 + mouseSmooth.x * 0.43;
       const cy = canvas.height * 0.62 + float + mouseSmooth.y * 0.43;
 
       ctx.save();
@@ -371,7 +419,7 @@ export default function CinematicHero() {
 
     const drawKeys = () => {
       const float = Math.sin(t * 0.0009 + 3) * 4;
-      const cx = canvas.width * 0.65 + mouseSmooth.x * 0.44;
+      const cx = canvas.width * 0.645 + mouseSmooth.x * 0.44;
       const cy = canvas.height * 0.59 + float + mouseSmooth.y * 0.44;
 
       ctx.save();
@@ -406,11 +454,11 @@ export default function CinematicHero() {
       ctx.restore();
     };
 
-    // Replacement: custom ID Card with realistic details
+    // ID Card with realistic details
     const drawIDCard = () => {
       const float = Math.sin(t * 0.00085 + 4) * 5;
-      const cx = canvas.width * 0.705 + mouseSmooth.x * 0.46;
-      const cy = canvas.height * 0.655 + float + mouseSmooth.y * 0.46;
+      const cx = canvas.width * 0.685 + mouseSmooth.x * 0.46;
+      const cy = canvas.height * 0.66 + float + mouseSmooth.y * 0.46;
 
       ctx.save();
       ctx.translate(cx, cy);
@@ -477,6 +525,66 @@ export default function CinematicHero() {
       ctx.fillStyle = badgeGlow;
       ctx.fill();
       ctx.strokeStyle = "rgba(0, 255, 255, 0.4)";
+      ctx.stroke();
+
+      ctx.restore();
+    };
+
+    // Smartwatch with matte graphite body and glowing display
+    const drawWatch = () => {
+      const float = Math.sin(t * 0.0011 + 4.5) * 6;
+      const cx = canvas.width * 0.725 + mouseSmooth.x * 0.44;
+      const cy = canvas.height * 0.63 + float + mouseSmooth.y * 0.44;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-0.1 + Math.sin(t * 0.0006) * 0.02);
+
+      // Shadow below smartwatch
+      const sg = ctx.createRadialGradient(0, 20 - float, 0, 0, 20 - float, 24);
+      sg.addColorStop(0, "rgba(0,0,0,0.3)");
+      sg.addColorStop(1, "transparent");
+      ctx.fillStyle = sg;
+      ctx.fillRect(-15, 12 - float, 30, 12);
+
+      // Matte graphite strap
+      ctx.beginPath();
+      ctx.roundRect(-8, -24, 16, 48, 4);
+      ctx.fillStyle = "#121417";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0, 140, 255, 0.15)";
+      ctx.stroke();
+
+      // Smartwatch dial (matte charcoal rounded rectangle)
+      ctx.beginPath();
+      ctx.roundRect(-13, -16, 26, 32, 5);
+      const g = ctx.createLinearGradient(-13, -16, 13, 16);
+      g.addColorStop(0, "#1f222b");
+      g.addColorStop(0.5, "#121417");
+      g.addColorStop(1, "#0a0c10");
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0, 160, 255, 0.35)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Display screen (neon blue glowing circular area)
+      ctx.beginPath();
+      ctx.arc(0, 0, 9, 0, Math.PI * 2);
+      const screenGlow = ctx.createRadialGradient(-2, -2, 0, 0, 0, 9);
+      screenGlow.addColorStop(0, "rgba(0, 180, 255, 0.55)");
+      screenGlow.addColorStop(1, "rgba(0, 60, 160, 0.35)");
+      ctx.fillStyle = screenGlow;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0, 240, 255, 0.4)";
+      ctx.stroke();
+
+      // Soft UI detail lines inside screen
+      ctx.beginPath();
+      ctx.moveTo(-5, 2);
+      ctx.lineTo(5, 2);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+      ctx.lineWidth = 1;
       ctx.stroke();
 
       ctx.restore();
@@ -638,6 +746,7 @@ export default function CinematicHero() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       drawBackground();
+      drawAbstractCurves();
       drawGrid();
       drawFog();
       drawOrbitRings();
@@ -648,6 +757,7 @@ export default function CinematicHero() {
       drawKeys();
       drawPhone();
       drawIDCard();
+      drawWatch();
       drawHoloPanels();
       drawLocationPins();
 
