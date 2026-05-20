@@ -18,6 +18,8 @@ interface HoloPanel {
   h: number;
   vy: number;
   a: number;
+  title: string;
+  metric: string;
 }
 
 interface Pin {
@@ -25,6 +27,7 @@ interface Pin {
   y: number;
   vy: number;
   phase: number;
+  label: string;
 }
 
 export default function CinematicHero() {
@@ -41,7 +44,6 @@ export default function CinematicHero() {
     const mouseSmooth = { x: 0, y: 0 };
 
     const handleMouseMove = (e: MouseEvent) => {
-      // Normalize to range [-1, 1] relative to center
       mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.y = (e.clientY / window.innerHeight) * 2 - 1;
     };
@@ -56,32 +58,32 @@ export default function CinematicHero() {
     window.addEventListener("resize", resize);
 
     // Floating particles (tiny glowing dust + slow drift particles)
-    const particles: Particle[] = Array.from({ length: 60 }, (_, idx) => {
+    const particles: Particle[] = Array.from({ length: 65 }, (_, idx) => {
       const isDust = idx % 2 === 0;
       return {
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * (isDust ? 0.05 : 0.15),
-        vy: (Math.random() - 0.5) * (isDust ? 0.05 : 0.15),
-        r: Math.random() * (isDust ? 0.7 : 1.4) + 0.3,
+        vx: (Math.random() - 0.5) * (isDust ? 0.04 : 0.12),
+        vy: (Math.random() - 0.5) * (isDust ? 0.04 : 0.12),
+        r: Math.random() * (isDust ? 0.6 : 1.5) + 0.3,
         a: Math.random(),
         va: (Math.random() - 0.5) * (isDust ? 0.002 : 0.004),
       };
     });
 
-    // Holographic panels with slow breathing motion
+    // Holographic panels with sci-fi metadata
     const panels: HoloPanel[] = [
-      { x: 0.58, y: 0.22, w: 160, h: 90, vy: 0.0001, a: 0 },
-      { x: 0.74, y: 0.42, w: 130, h: 70, vy: -0.00008, a: 0.3 },
-      { x: 0.60, y: 0.62, w: 110, h: 60, vy: 0.00009, a: 0.6 },
+      { x: 0.58, y: 0.22, w: 170, h: 95, vy: 0.0001, a: 0, title: "GEMINI MATCHING", metric: "99.4% CONFIDENCE" },
+      { x: 0.76, y: 0.40, w: 140, h: 75, vy: -0.00008, a: 0.3, title: "SYS.SCAN", metric: "RESOLVED: 78ms" },
+      { x: 0.59, y: 0.60, w: 130, h: 65, vy: 0.00009, a: 0.6, title: "NETWORK SECURE", metric: "NODE-A2 ACTIVE" },
     ];
 
-    // Location pins with slow atmospheric pulse
+    // Location pins with labels
     const pins: Pin[] = [
-      { x: 0.54, y: 0.28, vy: 0, phase: 0 },
-      { x: 0.77, y: 0.23, vy: 0, phase: 1.2 },
-      { x: 0.67, y: 0.58, vy: 0, phase: 2.4 },
-      { x: 0.49, y: 0.53, vy: 0, phase: 0.8 },
+      { x: 0.53, y: 0.29, vy: 0, phase: 0, label: "LHR-AIRPORT" },
+      { x: 0.78, y: 0.22, vy: 0, phase: 1.2, label: "NYC-SUBWAY" },
+      { x: 0.68, y: 0.56, vy: 0, phase: 2.4, label: "CA-MALL" },
+      { x: 0.49, y: 0.51, vy: 0, phase: 0.8, label: "BERLIN-METRO" },
     ];
 
     const drawBackground = () => {
@@ -89,43 +91,64 @@ export default function CinematicHero() {
       ctx.fillStyle = "#020204";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Slow breathing glow factor
       const breathe = 0.85 + Math.sin(t * 0.0008) * 0.15;
 
-      // Upper Section: Active cinematic ambient lights (subtle movement)
+      // Top glowing ambient highlight
       const topGlowX = canvas.width * (0.65 + Math.sin(t * 0.0005) * 0.08) + mouseSmooth.x * 0.15;
       const topGlowY = canvas.height * (0.25 + Math.cos(t * 0.0003) * 0.04) + mouseSmooth.y * 0.15;
       const topGlow = ctx.createRadialGradient(
         topGlowX, topGlowY, 0,
         topGlowX, topGlowY, canvas.width * 0.45
       );
-      topGlow.addColorStop(0, `rgba(0, 140, 255, ${0.07 * breathe})`);
+      topGlow.addColorStop(0, `rgba(0, 140, 255, ${0.08 * breathe})`);
       topGlow.addColorStop(0.6, `rgba(0, 70, 180, ${0.02 * breathe})`);
       topGlow.addColorStop(1, "transparent");
       ctx.fillStyle = topGlow;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Lower Section: Calm, breathing slow gradients & soft ambient glow
+      // Bottom breathing glow
       const bottomGlowY = canvas.height * 0.82 + Math.sin(t * 0.0004) * 15 + mouseSmooth.y * 0.1;
       const bottomGlow = ctx.createRadialGradient(
         canvas.width * 0.7, bottomGlowY, 0,
         canvas.width * 0.7, bottomGlowY, canvas.width * 0.35
       );
-      bottomGlow.addColorStop(0, `rgba(0, 80, 180, ${0.03 * breathe})`);
-      bottomGlow.addColorStop(0.5, `rgba(0, 40, 100, ${0.008 * breathe})`);
+      bottomGlow.addColorStop(0, `rgba(0, 80, 180, ${0.04 * breathe})`);
+      bottomGlow.addColorStop(0.5, `rgba(0, 40, 100, ${0.01 * breathe})`);
       bottomGlow.addColorStop(1, "transparent");
       ctx.fillStyle = bottomGlow;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
 
-    const drawAbstractCurves = () => {
-      // Minimal abstract curved lines in the background
+    const drawVolumetricSpotlight = () => {
+      // Cinematic Unreal Engine spotlight beam sweeping down
       ctx.save();
-      ctx.lineWidth = 1.5;
+      const breathe = 0.85 + Math.sin(t * 0.0007) * 0.15;
+      const targetX = canvas.width * 0.675 + mouseSmooth.x * 0.4;
+      const targetY = canvas.height * 0.68 + mouseSmooth.y * 0.4;
+
+      const beamGlow = ctx.createLinearGradient(canvas.width * 0.85, -100, targetX, targetY);
+      beamGlow.addColorStop(0, `rgba(0, 160, 255, ${0.16 * breathe})`);
+      beamGlow.addColorStop(0.5, `rgba(0, 100, 220, ${0.06 * breathe})`);
+      beamGlow.addColorStop(1, "rgba(0, 40, 150, 0)");
+
+      ctx.beginPath();
+      ctx.moveTo(canvas.width * 0.72, -100);
+      ctx.lineTo(canvas.width * 0.98, -100);
+      ctx.lineTo(targetX + 220, targetY + 50);
+      ctx.lineTo(targetX - 220, targetY + 50);
+      ctx.closePath();
+      ctx.fillStyle = beamGlow;
+      ctx.fill();
+      ctx.restore();
+    };
+
+    const drawAbstractCurves = () => {
+      ctx.save();
+      ctx.lineWidth = 1.2;
 
       // Curve 1
       ctx.beginPath();
-      const offset1 = Math.sin(t * 0.0002) * 30;
+      const offset1 = Math.sin(t * 0.0002) * 35;
       ctx.moveTo(canvas.width * 0.35 + mouseSmooth.x * 0.1, -100);
       ctx.quadraticCurveTo(
         canvas.width * 0.55 + offset1 + mouseSmooth.x * 0.15,
@@ -135,24 +158,24 @@ export default function CinematicHero() {
       );
       const g1 = ctx.createLinearGradient(0, 0, 0, canvas.height);
       g1.addColorStop(0, "rgba(0, 120, 255, 0.0)");
-      g1.addColorStop(0.5, "rgba(0, 150, 255, 0.03)");
+      g1.addColorStop(0.5, "rgba(0, 160, 255, 0.045)");
       g1.addColorStop(1, "rgba(0, 80, 200, 0.0)");
       ctx.strokeStyle = g1;
       ctx.stroke();
 
       // Curve 2
       ctx.beginPath();
-      const offset2 = Math.cos(t * 0.00025) * 40;
+      const offset2 = Math.cos(t * 0.00025) * 45;
       ctx.moveTo(canvas.width * 0.9 + mouseSmooth.x * 0.08, -100);
       ctx.quadraticCurveTo(
-        canvas.width * 0.65 + offset2 + mouseSmooth.x * 0.12,
+        canvas.width * 0.68 + offset2 + mouseSmooth.x * 0.12,
         canvas.height * 0.45,
         canvas.width * 0.85 + mouseSmooth.x * 0.08,
         canvas.height + 100
       );
       const g2 = ctx.createLinearGradient(0, 0, 0, canvas.height);
       g2.addColorStop(0, "rgba(0, 80, 200, 0.0)");
-      g2.addColorStop(0.4, "rgba(0, 180, 255, 0.02)");
+      g2.addColorStop(0.4, "rgba(0, 180, 255, 0.03)");
       g2.addColorStop(1, "rgba(0, 120, 255, 0.0)");
       ctx.strokeStyle = g2;
       ctx.stroke();
@@ -161,8 +184,7 @@ export default function CinematicHero() {
     };
 
     const drawGrid = () => {
-      // Faint subtle grid pattern with parallax offsets
-      ctx.strokeStyle = "rgba(0, 100, 255, 0.015)";
+      ctx.strokeStyle = "rgba(0, 100, 255, 0.012)";
       ctx.lineWidth = 1;
       const gs = 60;
       const ox = mouseSmooth.x * 0.05;
@@ -183,7 +205,6 @@ export default function CinematicHero() {
     };
 
     const drawFog = () => {
-      // Soft volumetric fog layer at the bottom
       for (let i = 0; i < 3; i++) {
         const rg = ctx.createRadialGradient(
           canvas.width * (0.45 + i * 0.15) + Math.sin(t * 0.0003 + i) * 12,
@@ -193,7 +214,7 @@ export default function CinematicHero() {
           canvas.height * 0.9,
           canvas.width * 0.25
         );
-        rg.addColorStop(0, `rgba(0, 30, 80, ${0.035 - i * 0.008})`);
+        rg.addColorStop(0, `rgba(0, 30, 80, ${0.04 - i * 0.009})`);
         rg.addColorStop(1, "transparent");
         ctx.fillStyle = rg;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -201,149 +222,207 @@ export default function CinematicHero() {
     };
 
     const drawPlatform = () => {
-      // Platform centered on the right
       const cx = canvas.width * 0.675 + mouseSmooth.x * 0.4;
       const cy = canvas.height * 0.72 + mouseSmooth.y * 0.4;
-      const rx = 175;
+      const rx = 180;
       const ry = 22;
 
-      // Slow breathing glow under the platform
-      const pg = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx * 1.35);
-      pg.addColorStop(0, `rgba(0, 120, 255, ${0.12 + Math.sin(t * 0.001) * 0.02})`);
+      // Platform bottom ambient shadow glow
+      const pg = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx * 1.4);
+      pg.addColorStop(0, `rgba(0, 120, 255, ${0.14 + Math.sin(t * 0.001) * 0.02})`);
       pg.addColorStop(1, "transparent");
       ctx.fillStyle = pg;
       ctx.fillRect(cx - rx * 2, cy - ry * 4, rx * 4, ry * 8);
 
-      // Matte dark platform tiers with soft highlights
-      [[rx, ry], [rx * 0.75, ry * 0.7], [rx * 0.5, ry * 0.5]].forEach(([r, ry2], i) => {
+      // Matte dark platform tiers
+      [[rx, ry], [rx * 0.78, ry * 0.75], [rx * 0.52, ry * 0.55]].forEach(([r, ry2], i) => {
         ctx.beginPath();
-        ctx.ellipse(cx, cy - i * 12, r, ry2, 0, 0, Math.PI * 2);
-        const g = ctx.createLinearGradient(cx - r, cy - i * 12 - ry2, cx + r, cy - i * 12 + ry2);
-        g.addColorStop(0, "#16181d");
+        ctx.ellipse(cx, cy - i * 11, r, ry2, 0, 0, Math.PI * 2);
+        const g = ctx.createLinearGradient(cx - r, cy - i * 11 - ry2, cx + r, cy - i * 11 + ry2);
+        g.addColorStop(0, "#191c22");
         g.addColorStop(0.5, "#0b0d10");
-        g.addColorStop(1, "#07080b");
+        g.addColorStop(1, "#06070a");
         ctx.fillStyle = g;
         ctx.fill();
-        ctx.strokeStyle = `rgba(0, 150, 255, ${0.22 - i * 0.06})`;
-        ctx.lineWidth = 1.2;
+
+        // Edge reflection highlight
+        ctx.strokeStyle = `rgba(0, 150, 255, ${0.28 - i * 0.07})`;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
+
+        // Specular glare on top tier
+        if (i === 2) {
+          ctx.beginPath();
+          ctx.ellipse(cx - 30, cy - i * 11 - 2, r * 0.45, ry2 * 0.45, -0.2, 0, Math.PI * 2);
+          const glare = ctx.createRadialGradient(cx - 30, cy - i * 11 - 2, 0, cx - 30, cy - i * 11 - 2, r * 0.45);
+          glare.addColorStop(0, "rgba(255, 255, 255, 0.04)");
+          glare.addColorStop(1, "transparent");
+          ctx.fillStyle = glare;
+          ctx.fill();
+        }
       });
     };
 
     const drawBackpack = () => {
-      // Very slow floating/breathing animation
       const float = Math.sin(t * 0.0008) * 6;
       const cx = canvas.width * 0.675 + mouseSmooth.x * 0.42;
-      const cy = canvas.height * 0.48 + float + mouseSmooth.y * 0.42;
+      const cy = canvas.height * 0.475 + float + mouseSmooth.y * 0.42;
 
       ctx.save();
       ctx.translate(cx, cy);
 
-      // Soft shadow breathing on the platform below
+      // Volumetric shadow below
       const shadowScale = 1 - float / 25;
       const sg = ctx.createRadialGradient(0, 95 - float, 0, 0, 95 - float, 80 * shadowScale);
-      sg.addColorStop(0, `rgba(0, 0, 0, ${0.35 * shadowScale})`);
+      sg.addColorStop(0, `rgba(0, 0, 0, ${0.4 * shadowScale})`);
       sg.addColorStop(1, "transparent");
       ctx.fillStyle = sg;
       ctx.fillRect(-90, 65 - float, 180, 60);
 
-      // Backpack body: Matte black & charcoal palette
+      // Top handle strap
       ctx.beginPath();
-      ctx.roundRect(-52, -70, 104, 130, 16);
+      ctx.ellipse(0, -74, 18, 12, 0, Math.PI, 0);
+      ctx.strokeStyle = "#171b22";
+      ctx.lineWidth = 9;
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(0, 150, 255, 0.2)";
+      ctx.lineWidth = 7;
+      ctx.stroke();
+
+      // Backpack body: Premium matte graphite curves
+      ctx.beginPath();
+      ctx.roundRect(-52, -70, 104, 130, 18);
       const bg = ctx.createLinearGradient(-52, -70, 52, 60);
-      bg.addColorStop(0, "#1c2028");
-      bg.addColorStop(0.4, "#12151b");
-      bg.addColorStop(1, "#0a0c10");
+      bg.addColorStop(0, "#1f242e");
+      bg.addColorStop(0.35, "#12151b");
+      bg.addColorStop(1, "#07090b");
       ctx.fillStyle = bg;
       ctx.fill();
 
-      // Soft outline highlight
-      ctx.strokeStyle = "rgba(0, 140, 255, 0.25)";
+      // Micro-stitch dashes along the border
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
       ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Rim light
+      ctx.setLineDash([3, 5]);
       ctx.beginPath();
-      ctx.roundRect(-52, -70, 104, 130, 16);
+      ctx.roundRect(-49, -67, 98, 124, 15);
+      ctx.stroke();
+      ctx.restore();
+
+      // Rim light glow
+      ctx.beginPath();
+      ctx.roundRect(-52, -70, 104, 130, 18);
       const rl = ctx.createLinearGradient(-52, 0, 52, 0);
-      rl.addColorStop(0, "rgba(0, 120, 255, 0.2)");
+      rl.addColorStop(0, "rgba(0, 160, 255, 0.22)");
       rl.addColorStop(0.5, "transparent");
-      rl.addColorStop(1, "rgba(0, 80, 200, 0.12)");
+      rl.addColorStop(1, "rgba(0, 100, 255, 0.15)");
       ctx.strokeStyle = rl;
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Front pocket
-      ctx.beginPath();
-      ctx.roundRect(-36, -20, 72, 60, 10);
-      ctx.fillStyle = "#0a0d11";
-      ctx.fill();
-      ctx.strokeStyle = "rgba(0, 100, 255, 0.15)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      // Side mesh pockets
+      [-56, 44].forEach((sx) => {
+        ctx.beginPath();
+        ctx.roundRect(sx, -10, 12, 45, 3);
+        ctx.fillStyle = "#0c0e12";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(0, 140, 255, 0.15)";
+        ctx.stroke();
+        // Mesh pattern
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+        ctx.lineWidth = 0.8;
+        ctx.setLineDash([2, 2]);
+        ctx.stroke();
+        ctx.restore();
+      });
 
-      // Zipper line
+      // Front pocket (rounded capsule style)
       ctx.beginPath();
-      ctx.moveTo(-30, -22);
-      ctx.lineTo(30, -22);
-      ctx.strokeStyle = "rgba(0, 160, 255, 0.3)";
+      ctx.roundRect(-36, -18, 72, 58, 12);
+      ctx.fillStyle = "#090c0f";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0, 120, 255, 0.2)";
       ctx.lineWidth = 1.2;
       ctx.stroke();
 
-      // Straps
-      ctx.beginPath();
-      ctx.moveTo(-28, -70);
-      ctx.quadraticCurveTo(-35, -90, -28, -100);
-      ctx.strokeStyle = "#171a22";
-      ctx.lineWidth = 14;
-      ctx.lineCap = "round";
-      ctx.stroke();
-      ctx.strokeStyle = "rgba(0, 100, 200, 0.15)";
-      ctx.lineWidth = 12;
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(28, -70);
-      ctx.quadraticCurveTo(35, -90, 28, -100);
-      ctx.strokeStyle = "#171a22";
-      ctx.lineWidth = 14;
-      ctx.stroke();
-      ctx.strokeStyle = "rgba(0, 100, 200, 0.15)";
-      ctx.lineWidth = 12;
-      ctx.stroke();
-
-      // Tag dangling slightly
-      const ta = Math.sin(t * 0.0006) * 0.08;
+      // Front pocket stitch
       ctx.save();
-      ctx.translate(20, -55);
-      ctx.rotate(ta);
+      ctx.strokeStyle = "rgba(0, 160, 255, 0.1)";
+      ctx.setLineDash([2, 4]);
       ctx.beginPath();
-      ctx.roundRect(-18, -26, 36, 44, 5);
-      ctx.fillStyle = "#080a0d";
-      ctx.fill();
-      ctx.strokeStyle = "rgba(0, 160, 255, 0.4)";
-      ctx.lineWidth = 1;
+      ctx.roundRect(-33, -15, 66, 52, 9);
       ctx.stroke();
-
-      // Tag hole
-      ctx.beginPath();
-      ctx.arc(0, -24, 3, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(0, 160, 255, 0.5)";
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-
-      // Tag text
-      ctx.fillStyle = "#9ad2ff";
-      ctx.font = "bold 6.5px Inter, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("LOST &", 0, -8);
-      ctx.fillText("FOUND", 0, 2);
       ctx.restore();
 
-      // Glow aura
-      const aura = ctx.createRadialGradient(0, 0, 40, 0, 0, 110);
+      // Zipper slider detail
+      ctx.beginPath();
+      ctx.roundRect(-6, -23, 12, 5, 1.5);
+      ctx.fillStyle = "#2a313d";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0, 180, 255, 0.4)";
+      ctx.stroke();
+
+      // Shoulder harness straps
+      [-28, 28].forEach((sx) => {
+        ctx.beginPath();
+        ctx.moveTo(sx, -70);
+        ctx.quadraticCurveTo(sx > 0 ? 38 : -38, -92, sx, -102);
+        ctx.strokeStyle = "#161920";
+        ctx.lineWidth = 13;
+        ctx.lineCap = "round";
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(0, 120, 255, 0.15)";
+        ctx.lineWidth = 11;
+        ctx.stroke();
+      });
+
+      // Lost & Found Tag (detailed lanyard connection)
+      const ta = Math.sin(t * 0.0006) * 0.08;
+      ctx.save();
+      ctx.translate(22, -50);
+      ctx.rotate(ta);
+
+      // Strap link
+      ctx.beginPath();
+      ctx.moveTo(-2, -30);
+      ctx.lineTo(-2, -24);
+      ctx.strokeStyle = "rgba(0, 160, 255, 0.4)";
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      // Tag body
+      ctx.beginPath();
+      ctx.roundRect(-18, -24, 36, 44, 6);
+      ctx.fillStyle = "#07090c";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0, 180, 255, 0.45)";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Tech details on tag
+      ctx.fillStyle = "rgba(0, 160, 255, 0.25)";
+      ctx.fillRect(-12, -18, 8, 1.5);
+      ctx.fillRect(-12, -14, 24, 0.85);
+
+      // Tag text
+      ctx.fillStyle = "#a2dbff";
+      ctx.font = "bold 6.5px 'Inter', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("LOST &", 0, -3);
+      ctx.fillText("FOUND", 0, 7);
+
+      // QR / Barcode indicator
+      ctx.fillStyle = "rgba(0, 180, 255, 0.4)";
+      for (let bi = 0; bi < 5; bi++) {
+        ctx.fillRect(-10 + bi * 4, 14, bi % 2 === 0 ? 2 : 1, 4);
+      }
+      ctx.restore();
+
+      // Ambient reflection aura
+      const aura = ctx.createRadialGradient(0, 0, 45, 0, 0, 115);
       aura.addColorStop(0, "transparent");
-      aura.addColorStop(1, `rgba(0, 100, 255, ${0.05 + Math.sin(t * 0.001) * 0.02})`);
+      aura.addColorStop(1, `rgba(0, 100, 255, ${0.06 + Math.sin(t * 0.001) * 0.025})`);
       ctx.fillStyle = aura;
       ctx.fillRect(-120, -120, 240, 240);
 
@@ -357,63 +436,134 @@ export default function CinematicHero() {
 
       ctx.save();
       ctx.translate(cx, cy);
+      ctx.rotate(0.04);
 
-      // Matte dark phone chassis
+      // Matte dark phone chassis (flat edge iPhone style)
       ctx.beginPath();
-      ctx.roundRect(-16, -42, 32, 68, 6);
+      ctx.roundRect(-16, -42, 32, 68, 8);
       const g = ctx.createLinearGradient(-16, -42, 16, 26);
-      g.addColorStop(0, "#191d27");
-      g.addColorStop(1, "#0b0c12");
+      g.addColorStop(0, "#222733");
+      g.addColorStop(1, "#0c0d13");
       ctx.fillStyle = g;
       ctx.fill();
-      ctx.strokeStyle = "rgba(0, 140, 255, 0.35)";
+      ctx.strokeStyle = "rgba(0, 150, 255, 0.4)";
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Screen soft neon glow
+      // Side volume buttons
+      ctx.fillStyle = "#2c3342";
+      ctx.fillRect(-18, -25, 2, 8);
+      ctx.fillRect(-18, -14, 2, 8);
+
+      // Screen soft glow
       ctx.beginPath();
-      ctx.roundRect(-13, -38, 26, 56, 4);
-      const sg = ctx.createLinearGradient(-13, -38, 13, 18);
-      sg.addColorStop(0, "rgba(0, 90, 180, 0.5)");
-      sg.addColorStop(1, "rgba(0, 30, 90, 0.3)");
+      ctx.roundRect(-13.5, -39.5, 27, 63, 6);
+      const sg = ctx.createLinearGradient(-13.5, -39.5, 13.5, 23.5);
+      sg.addColorStop(0, "rgba(0, 95, 200, 0.55)");
+      sg.addColorStop(0.5, "rgba(0, 45, 110, 0.35)");
+      sg.addColorStop(1, "rgba(0, 15, 50, 0.2)");
       ctx.fillStyle = sg;
       ctx.fill();
+
+      // Dynamic Island notch
+      ctx.beginPath();
+      ctx.roundRect(-5, -36, 10, 2.8, 1.4);
+      ctx.fillStyle = "#06070a";
+      ctx.fill();
+
+      // Glowing route/map graphic on screen
+      ctx.strokeStyle = "rgba(0, 240, 255, 0.35)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-8, 10);
+      ctx.quadraticCurveTo(-2, -5, 5, 2);
+      ctx.lineTo(8, -12);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(8, -12, 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+
+      // Specular sweep across the glass screen
+      const sweep = Math.sin(t * 0.008) * 45;
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(-13.5, -39.5, 27, 63, 6);
+      ctx.clip();
+      ctx.beginPath();
+      ctx.moveTo(-30 + sweep, -50);
+      ctx.lineTo(-10 + sweep, -50);
+      ctx.lineTo(30 + sweep, 40);
+      ctx.lineTo(10 + sweep, 40);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.07)";
+      ctx.fill();
+      ctx.restore();
+
       ctx.restore();
     };
 
     const drawWallet = () => {
       const float = Math.sin(t * 0.00075 + 2) * 4;
       const cx = canvas.width * 0.61 + mouseSmooth.x * 0.43;
-      const cy = canvas.height * 0.62 + float + mouseSmooth.y * 0.43;
+      const cy = canvas.height * 0.625 + float + mouseSmooth.y * 0.43;
 
       ctx.save();
       ctx.translate(cx, cy);
+      ctx.rotate(-0.06);
 
       // Wallet body
       ctx.beginPath();
-      ctx.roundRect(-32, -14, 64, 28, 6);
-      const g = ctx.createLinearGradient(-32, -14, 32, 14);
-      g.addColorStop(0, "#191a20");
+      ctx.roundRect(-32, -15, 64, 30, 6);
+      const g = ctx.createLinearGradient(-32, -15, 32, 15);
+      g.addColorStop(0, "#1f2128");
       g.addColorStop(1, "#0d0e12");
       ctx.fillStyle = g;
       ctx.fill();
-      ctx.strokeStyle = "rgba(0, 120, 255, 0.25)";
+      ctx.strokeStyle = "rgba(0, 130, 255, 0.28)";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Stitching around wallet edge
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+      ctx.lineWidth = 0.85;
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath();
+      ctx.roundRect(-29, -12, 58, 24, 4);
+      ctx.stroke();
+      ctx.restore();
+
+      // Pocket division line
+      ctx.beginPath();
+      ctx.moveTo(-32, -1);
+      ctx.lineTo(32, -1);
+      ctx.strokeStyle = "rgba(0, 110, 210, 0.2)";
       ctx.lineWidth = 1;
       ctx.stroke();
 
+      // Silver brand logo inlay
       ctx.beginPath();
-      ctx.moveTo(-32, 0);
-      ctx.lineTo(32, 0);
-      ctx.strokeStyle = "rgba(0, 100, 200, 0.15)";
-      ctx.stroke();
+      ctx.moveTo(-18, -8);
+      ctx.lineTo(-14, -8);
+      ctx.lineTo(-16, -11);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(0, 180, 255, 0.55)";
+      ctx.fill();
 
-      // Card/ID chip inside wallet
+      // Protruding credit card slots (gold contacts)
       ctx.beginPath();
-      ctx.roundRect(10, -8, 16, 14, 2);
-      ctx.fillStyle = "rgba(0, 160, 255, 0.12)";
+      ctx.roundRect(10, -9, 17, 15, 1.5);
+      ctx.fillStyle = "rgba(0, 160, 255, 0.14)";
       ctx.fill();
       ctx.strokeStyle = "rgba(0, 160, 255, 0.35)";
       ctx.stroke();
+
+      // Tiny metallic chip lines
+      ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+      ctx.fillRect(15, -6, 4, 3);
+
       ctx.restore();
     };
 
@@ -425,71 +575,111 @@ export default function CinematicHero() {
       ctx.save();
       ctx.translate(cx, cy);
 
-      // Key ring
+      // Double metal split-ring
       ctx.beginPath();
       ctx.arc(0, 0, 10, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(0, 140, 255, 0.45)";
-      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = "rgba(0, 150, 255, 0.5)";
+      ctx.lineWidth = 2.2;
       ctx.stroke();
 
-      // Keys (slower angle breathing)
+      // Subtly floating keys
       [-0.4, 0.2, 0.8].forEach((a, i) => {
         ctx.save();
         ctx.rotate(a + Math.sin(t * 0.0005 + i) * 0.02);
-        ctx.beginPath();
-        ctx.moveTo(8, 0);
-        ctx.lineTo(36, 0);
-        ctx.strokeStyle = `rgba(0, ${110 + i * 20}, 255, 0.35)`;
-        ctx.lineWidth = 2.5;
-        ctx.lineCap = "round";
-        ctx.stroke();
 
-        ctx.beginPath();
-        ctx.roundRect(32, -5, 10, 10, 2);
-        ctx.strokeStyle = "rgba(0, 140, 255, 0.35)";
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
+        if (i === 1) {
+          // Modern car key fob instead of standard key
+          ctx.beginPath();
+          ctx.roundRect(8, -8, 22, 16, 4);
+          ctx.fillStyle = "#11141a";
+          ctx.fill();
+          ctx.strokeStyle = "rgba(0, 160, 255, 0.35)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Buttons
+          ctx.fillStyle = "rgba(0, 200, 255, 0.35)";
+          ctx.fillRect(13, -4, 4, 3);
+          ctx.fillRect(20, -4, 4, 3);
+
+          // LED indicator
+          ctx.beginPath();
+          ctx.arc(26, 4, 1.2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0, 255, 255, ${0.4 + Math.sin(t * 0.003) * 0.3})`;
+          ctx.fill();
+        } else {
+          // standard key shaft with notches
+          ctx.beginPath();
+          ctx.moveTo(8, 0);
+          ctx.lineTo(36, 0);
+          ctx.strokeStyle = `rgba(0, ${110 + i * 20}, 255, 0.45)`;
+          ctx.lineWidth = 2.8;
+          ctx.lineCap = "round";
+          ctx.stroke();
+
+          // teeth notches
+          ctx.beginPath();
+          ctx.moveTo(24, 1.4);
+          ctx.lineTo(24, 4.5);
+          ctx.moveTo(28, 1.4);
+          ctx.lineTo(28, 5.5);
+          ctx.moveTo(32, 1.4);
+          ctx.lineTo(32, 4);
+          ctx.strokeStyle = `rgba(0, ${110 + i * 20}, 255, 0.45)`;
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+
+          // Key bow loop
+          ctx.beginPath();
+          ctx.roundRect(31, -5, 10, 10, 2);
+          ctx.strokeStyle = "rgba(0, 140, 255, 0.35)";
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
         ctx.restore();
       });
       ctx.restore();
     };
 
-    // ID Card with realistic details
     const drawIDCard = () => {
       const float = Math.sin(t * 0.00085 + 4) * 5;
       const cx = canvas.width * 0.685 + mouseSmooth.x * 0.46;
-      const cy = canvas.height * 0.66 + float + mouseSmooth.y * 0.46;
+      const cy = canvas.height * 0.665 + float + mouseSmooth.y * 0.46;
 
       ctx.save();
       ctx.translate(cx, cy);
-      ctx.rotate(0.12 + Math.sin(t * 0.0005) * 0.02); // Slight tilt
+      ctx.rotate(0.12 + Math.sin(t * 0.0005) * 0.02);
 
       // Soft shadow
       const sg = ctx.createRadialGradient(0, 22 - float, 0, 0, 22 - float, 28);
-      sg.addColorStop(0, "rgba(0,0,0,0.35)");
+      sg.addColorStop(0, "rgba(0,0,0,0.4)");
       sg.addColorStop(1, "transparent");
       ctx.fillStyle = sg;
       ctx.fillRect(-22, 12 - float, 44, 15);
 
-      // Card body (matte charcoal & black)
+      // Card body
       ctx.beginPath();
       ctx.roundRect(-22, -14, 44, 28, 4);
       const g = ctx.createLinearGradient(-22, -14, 22, 14);
-      g.addColorStop(0, "#1e2128");
+      g.addColorStop(0, "#1f2229");
       g.addColorStop(0.5, "#121417");
       g.addColorStop(1, "#0d0f11");
       ctx.fillStyle = g;
       ctx.fill();
-
-      // Neon blue highlight border
-      ctx.strokeStyle = "rgba(0, 180, 255, 0.35)";
+      ctx.strokeStyle = "rgba(0, 180, 255, 0.4)";
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Card header (neon blue strip)
+      // Top slot for clip
+      ctx.beginPath();
+      ctx.roundRect(-6, -12, 12, 1.8, 0.8);
+      ctx.fillStyle = "#0c0d10";
+      ctx.fill();
+
+      // Neon blue header strip
       ctx.beginPath();
       ctx.roundRect(-22, -14, 44, 5, [4, 4, 0, 0]);
-      ctx.fillStyle = "rgba(0, 120, 255, 0.35)";
+      ctx.fillStyle = "rgba(0, 120, 255, 0.38)";
       ctx.fill();
 
       // Photo slot
@@ -497,40 +687,46 @@ export default function CinematicHero() {
       ctx.roundRect(-16, -4, 9, 11, 1);
       ctx.fillStyle = "#151820";
       ctx.fill();
-      ctx.strokeStyle = "rgba(0, 140, 255, 0.2)";
+      ctx.strokeStyle = "rgba(0, 140, 255, 0.25)";
       ctx.stroke();
 
-      // Avatar inside photo
+      // Avatar silhouette inside photo
       ctx.beginPath();
       ctx.arc(-11.5, -1, 2, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(0, 180, 255, 0.3)";
+      ctx.fillStyle = "rgba(0, 190, 255, 0.35)";
       ctx.fill();
       ctx.beginPath();
       ctx.arc(-11.5, 4.5, 3.5, Math.PI, 0);
       ctx.fill();
 
-      // Card text lines
-      ctx.fillStyle = "rgba(0, 160, 255, 0.25)";
-      ctx.fillRect(-3, -4, 15, 1.2);
+      // Detailed text metadata lines
+      ctx.fillStyle = "rgba(0, 160, 255, 0.28)";
+      ctx.fillRect(-3, -4, 16, 1.2);
       ctx.fillRect(-3, 0, 12, 1.2);
-      ctx.fillRect(-3, 4, 8, 1.2);
+      ctx.fillRect(-3, 4, 9, 1.2);
 
-      // Holographic security badge/chip (Gentle slow pulse)
-      const pulse = 0.4 + Math.sin(t * 0.0015) * 0.1;
+      // Holographic Security Badge with interactive color shifting
+      const colorPhase = Math.sin(t * 0.0015);
       ctx.beginPath();
-      ctx.roundRect(12, 7, 6, 5, 1);
-      const badgeGlow = ctx.createLinearGradient(12, 7, 18, 12);
-      badgeGlow.addColorStop(0, `rgba(0, 220, 255, ${pulse + 0.1})`);
-      badgeGlow.addColorStop(1, `rgba(0, 80, 200, ${pulse - 0.1})`);
+      ctx.roundRect(11.5, 6.5, 7, 6, 1.5);
+      const badgeGlow = ctx.createLinearGradient(11.5, 6.5, 18.5, 12.5);
+      badgeGlow.addColorStop(0, `hsla(${(t * 0.08) % 360}, 90%, 65%, 0.6)`);
+      badgeGlow.addColorStop(1, `hsla(${((t * 0.08) + 120) % 360}, 90%, 45%, 0.4)`);
       ctx.fillStyle = badgeGlow;
       ctx.fill();
-      ctx.strokeStyle = "rgba(0, 255, 255, 0.4)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+      ctx.lineWidth = 0.8;
       ctx.stroke();
+
+      // Tiny barcode
+      ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+      for (let bi = 0; bi < 6; bi++) {
+        ctx.fillRect(-18 + bi * 2.5, 9, bi % 2 === 0 ? 1 : 0.5, 2.5);
+      }
 
       ctx.restore();
     };
 
-    // Smartwatch with matte graphite body and glowing display
     const drawWatch = () => {
       const float = Math.sin(t * 0.0011 + 4.5) * 6;
       const cx = canvas.width * 0.725 + mouseSmooth.x * 0.44;
@@ -538,53 +734,75 @@ export default function CinematicHero() {
 
       ctx.save();
       ctx.translate(cx, cy);
-      ctx.rotate(-0.1 + Math.sin(t * 0.0006) * 0.02);
+      ctx.rotate(-0.08 + Math.sin(t * 0.0006) * 0.02);
 
       // Shadow below smartwatch
       const sg = ctx.createRadialGradient(0, 20 - float, 0, 0, 20 - float, 24);
-      sg.addColorStop(0, "rgba(0,0,0,0.3)");
+      sg.addColorStop(0, "rgba(0,0,0,0.35)");
       sg.addColorStop(1, "transparent");
       ctx.fillStyle = sg;
       ctx.fillRect(-15, 12 - float, 30, 12);
 
-      // Matte graphite strap
+      // Detailed mesh watch strap
       ctx.beginPath();
       ctx.roundRect(-8, -24, 16, 48, 4);
-      ctx.fillStyle = "#121417";
+      ctx.fillStyle = "#14171d";
       ctx.fill();
-      ctx.strokeStyle = "rgba(0, 140, 255, 0.15)";
+      ctx.strokeStyle = "rgba(0, 140, 255, 0.2)";
+      ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Smartwatch dial (matte charcoal rounded rectangle)
+      // Watch strap mesh texture lines
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+      ctx.lineWidth = 0.5;
+      for (let sy = -20; sy < 24; sy += 4) {
+        ctx.beginPath();
+        ctx.moveTo(-7, sy);
+        ctx.lineTo(7, sy);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Smartwatch dial body (matte charcoal rounded rectangle)
       ctx.beginPath();
-      ctx.roundRect(-13, -16, 26, 32, 5);
+      ctx.roundRect(-13, -16, 26, 32, 6);
       const g = ctx.createLinearGradient(-13, -16, 13, 16);
-      g.addColorStop(0, "#1f222b");
-      g.addColorStop(0.5, "#121417");
+      g.addColorStop(0, "#232630");
+      g.addColorStop(0.5, "#15171e");
       g.addColorStop(1, "#0a0c10");
       ctx.fillStyle = g;
       ctx.fill();
-      ctx.strokeStyle = "rgba(0, 160, 255, 0.35)";
+      ctx.strokeStyle = "rgba(0, 170, 255, 0.4)";
       ctx.lineWidth = 1;
       ctx.stroke();
+
+      // Side Dial Crown
+      ctx.fillStyle = "#2c313d";
+      ctx.fillRect(13, -4, 2, 7);
 
       // Display screen (neon blue glowing circular area)
       ctx.beginPath();
-      ctx.arc(0, 0, 9, 0, Math.PI * 2);
-      const screenGlow = ctx.createRadialGradient(-2, -2, 0, 0, 0, 9);
-      screenGlow.addColorStop(0, "rgba(0, 180, 255, 0.55)");
-      screenGlow.addColorStop(1, "rgba(0, 60, 160, 0.35)");
+      ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
+      const screenGlow = ctx.createRadialGradient(-2, -2, 0, 0, 0, 9.5);
+      screenGlow.addColorStop(0, "rgba(0, 190, 255, 0.65)");
+      screenGlow.addColorStop(1, "rgba(0, 60, 160, 0.4)");
       ctx.fillStyle = screenGlow;
       ctx.fill();
-      ctx.strokeStyle = "rgba(0, 240, 255, 0.4)";
+      ctx.strokeStyle = "rgba(0, 255, 255, 0.45)";
+      ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Soft UI detail lines inside screen
-      ctx.beginPath();
-      ctx.moveTo(-5, 2);
-      ctx.lineTo(5, 2);
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+      // Glowing heart rate sweep UI detail inside watch
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
       ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-6, 2);
+      ctx.lineTo(-3, 2);
+      ctx.lineTo(-1, -3);
+      ctx.lineTo(1, 4);
+      ctx.lineTo(3, 2);
+      ctx.lineTo(6, 2);
       ctx.stroke();
 
       ctx.restore();
@@ -595,38 +813,72 @@ export default function CinematicHero() {
         const t2 = t * 0.0006;
         const y = canvas.height * p.y + Math.sin(t2 + p.a) * 12 + mouseSmooth.y * 0.65;
         const x = canvas.width * p.x + mouseSmooth.x * 0.65;
-        const alpha = 0.42 + Math.sin(t2 * 1.5 + i) * 0.1; // calmer opacity pulse
+        const alpha = 0.46 + Math.sin(t2 * 1.5 + i) * 0.08;
 
         ctx.save();
         ctx.globalAlpha = alpha;
 
-        // Panel background
+        // Glassmorphic panel background
         ctx.beginPath();
-        ctx.roundRect(x, y, p.w, p.h, 8);
+        ctx.roundRect(x, y, p.w, p.h, 10);
         const g = ctx.createLinearGradient(x, y, x + p.w, y + p.h);
-        g.addColorStop(0, "rgba(0, 60, 140, 0.2)");
-        g.addColorStop(1, "rgba(0, 20, 80, 0.1)");
+        g.addColorStop(0, "rgba(0, 70, 160, 0.18)");
+        g.addColorStop(1, "rgba(0, 25, 90, 0.08)");
         ctx.fillStyle = g;
         ctx.fill();
 
-        ctx.strokeStyle = `rgba(0, 160, 255, ${0.35 + Math.sin(t2 + i) * 0.08})`;
+        // Neon outline border
+        ctx.strokeStyle = `rgba(0, 170, 255, ${0.38 + Math.sin(t2 + i) * 0.08})`;
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Panel content lines
-        const lc = ["rgba(0, 200, 255, 0.5)", "rgba(0, 150, 255, 0.35)", "rgba(0, 100, 200, 0.25)"];
-        [0.25, 0.45, 0.65].forEach((fy, li) => {
-          ctx.beginPath();
-          ctx.roundRect(x + 10, y + p.h * fy, p.w * (li === 0 ? 0.7 : 0.5), 3.5, 1.5);
-          ctx.fillStyle = lc[li];
-          ctx.fill();
-        });
+        // Corner brackets / brackets design
+        ctx.strokeStyle = "rgba(0, 230, 255, 0.6)";
+        ctx.lineWidth = 1.5;
+        // Top-left corner
+        ctx.beginPath(); ctx.moveTo(x + 8, y); ctx.lineTo(x, y); ctx.lineTo(x, y + 8); ctx.stroke();
+        // Bottom-right corner
+        ctx.beginPath(); ctx.moveTo(x + p.w - 8, y + p.h); ctx.lineTo(x + p.w, y + p.h); ctx.lineTo(x + p.w, y + p.h - 8); ctx.stroke();
 
-        // Dot indicator
+        // Sci-fi Title
+        ctx.fillStyle = "rgba(165, 231, 255, 0.9)";
+        ctx.font = "900 8.5px 'Inter', sans-serif";
+        ctx.fillText(p.title, x + 12, y + 18);
+
+        // Sci-fi Metric / Subtitle
+        ctx.fillStyle = "rgba(0, 220, 255, 0.6)";
+        ctx.font = "600 7px 'Inter', sans-serif";
+        ctx.fillText(p.metric, x + 12, y + 30);
+
+        // Technical data bars
+        ctx.strokeStyle = "rgba(0, 160, 255, 0.15)";
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(x + p.w - 14, y + 14, 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 200, 255, ${0.5 + Math.sin(t2 * 2 + i) * 0.3})`;
-        ctx.fill();
+        ctx.moveTo(x + 12, y + 42);
+        ctx.lineTo(x + p.w - 12, y + 42);
+        ctx.stroke();
+
+        // Live grid graph visualization
+        const graphW = p.w - 24;
+        const graphH = 20;
+        const graphY = y + 52;
+        ctx.strokeStyle = "rgba(0, 220, 255, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let gx = 0; gx < graphW; gx += 4) {
+          const gy = Math.sin(t * 0.04 + gx * 0.2 + i * 4) * (graphH * 0.35);
+          if (gx === 0) {
+            ctx.moveTo(x + 12 + gx, graphY + gy);
+          } else {
+            ctx.lineTo(x + 12 + gx, graphY + gy);
+          }
+        }
+        ctx.stroke();
+
+        // Technical status label
+        ctx.fillStyle = "rgba(0, 240, 255, 0.4)";
+        ctx.font = "bold 6.5px 'Inter', sans-serif";
+        ctx.fillText("SYS.LOC: ENG-A3", x + 12, y + p.h - 8);
 
         ctx.restore();
       });
@@ -641,13 +893,26 @@ export default function CinematicHero() {
         const s = 0.65 + i * 0.12;
 
         ctx.save();
+
+        // 1. Volumetric laser beam rising up to sky
+        const beamGlow = ctx.createLinearGradient(x, y, x, y - 110);
+        beamGlow.addColorStop(0, "rgba(0, 160, 255, 0.28)");
+        beamGlow.addColorStop(0.5, "rgba(0, 110, 230, 0.08)");
+        beamGlow.addColorStop(1, "rgba(0, 80, 200, 0)");
+        ctx.strokeStyle = beamGlow;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y + 10);
+        ctx.lineTo(x, y - 100);
+        ctx.stroke();
+
         ctx.translate(x, y);
         ctx.scale(s, s);
 
         // Pulse ring
         ctx.beginPath();
         ctx.arc(0, 10, 15 + pulse * 6, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(0, 160, 255, ${0.08 + pulse * 0.08})`;
+        ctx.strokeStyle = `rgba(0, 170, 255, ${0.08 + pulse * 0.08})`;
         ctx.lineWidth = 1.2;
         ctx.stroke();
 
@@ -655,32 +920,38 @@ export default function CinematicHero() {
         ctx.beginPath();
         ctx.arc(0, 0, 11, 0, Math.PI * 2);
         const g = ctx.createRadialGradient(-3, -3, 0, 0, 0, 11);
-        g.addColorStop(0, "rgba(0, 180, 255, 0.8)");
-        g.addColorStop(1, "rgba(0, 80, 200, 0.6)");
+        g.addColorStop(0, "rgba(0, 190, 255, 0.85)");
+        g.addColorStop(1, "rgba(0, 90, 210, 0.65)");
         ctx.fillStyle = g;
         ctx.fill();
-        ctx.strokeStyle = "rgba(0, 220, 255, 0.5)";
+        ctx.strokeStyle = "rgba(0, 230, 255, 0.55)";
         ctx.lineWidth = 1.2;
         ctx.stroke();
 
-        // Pin tip
+        // Pin tip pointing down
         ctx.beginPath();
         ctx.moveTo(-5, 7);
         ctx.lineTo(5, 7);
         ctx.lineTo(0, 19);
         ctx.closePath();
-        ctx.fillStyle = "rgba(0, 120, 220, 0.7)";
+        ctx.fillStyle = "rgba(0, 130, 230, 0.75)";
         ctx.fill();
 
-        // Inner dot
+        // Inner white core dot
         ctx.beginPath();
         ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
         ctx.fillStyle = "#fff";
         ctx.fill();
 
-        // Glow
+        // Glowing text label floating above the pin
+        ctx.fillStyle = "rgba(160, 210, 255, 0.75)";
+        ctx.font = "bold 8.5px 'Inter', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(p.label, 0, -18);
+
+        // Glow aura rectangle
         const gl = ctx.createRadialGradient(0, 0, 0, 0, 0, 20);
-        gl.addColorStop(0, `rgba(0, 160, 255, ${0.25 + pulse * 0.15})`);
+        gl.addColorStop(0, `rgba(0, 170, 255, ${0.28 + pulse * 0.15})`);
         gl.addColorStop(1, "transparent");
         ctx.fillStyle = gl;
         ctx.fillRect(-25, -25, 50, 50);
@@ -693,16 +964,16 @@ export default function CinematicHero() {
       const cx = canvas.width * 0.675 + mouseSmooth.x * 0.4;
       const cy = canvas.height * 0.55 + mouseSmooth.y * 0.4;
 
-      [130, 180, 230].forEach((r, i) => {
+      [130, 185, 235].forEach((r, i) => {
         ctx.save();
         ctx.translate(cx, cy);
-        ctx.rotate(t * 0.00012 * (i % 2 === 0 ? 1 : -1));
+        ctx.rotate(t * 0.00014 * (i % 2 === 0 ? 1 : -1));
         ctx.scale(1, 0.28);
         ctx.beginPath();
         ctx.arc(0, 0, r, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(0, 120, 255, ${0.1 - i * 0.025})`;
+        ctx.strokeStyle = `rgba(0, 130, 255, ${0.11 - i * 0.025})`;
         ctx.lineWidth = 1;
-        ctx.setLineDash([8, 18]);
+        ctx.setLineDash([8, 20]);
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.restore();
@@ -725,13 +996,12 @@ export default function CinematicHero() {
         if (p.y < 0) p.y = canvas.height;
         if (p.y > canvas.height) p.y = 0;
 
-        // Apply smooth parallax to floating particles
-        const px = p.x + mouseSmooth.x * 0.75;
-        const py = p.y + mouseSmooth.y * 0.75;
+        const px = p.x + mouseSmooth.x * 0.8;
+        const py = p.y + mouseSmooth.y * 0.8;
 
         ctx.beginPath();
         ctx.arc(px, py, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 170, 255, ${p.a * 0.35})`;
+        ctx.fillStyle = `rgba(0, 180, 255, ${p.a * 0.42})`;
         ctx.fill();
       });
     };
@@ -739,13 +1009,14 @@ export default function CinematicHero() {
     const frame = () => {
       t++;
 
-      // Smooth interactive parallax interpolation
-      mouseSmooth.x += (mouse.x * 20 - mouseSmooth.x) * 0.04;
-      mouseSmooth.y += (mouse.y * 20 - mouseSmooth.y) * 0.04;
+      // Parallax smooth interpolation
+      mouseSmooth.x += (mouse.x * 20 - mouseSmooth.x) * 0.035;
+      mouseSmooth.y += (mouse.y * 20 - mouseSmooth.y) * 0.035;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       drawBackground();
+      drawVolumetricSpotlight();
       drawAbstractCurves();
       drawGrid();
       drawFog();
@@ -786,4 +1057,3 @@ export default function CinematicHero() {
     />
   );
 }
-
