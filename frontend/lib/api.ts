@@ -7,13 +7,28 @@ const api = axios.create({ baseURL: API_URL });
 /* ── Auto-attach JWT token ── */
 api.interceptors.request.use((config) => {
   if (config.data instanceof FormData) {
-    delete config.headers["Content-Type"];
+    if (config.headers && typeof config.headers.delete === "function") {
+      config.headers.delete("Content-Type");
+    } else if (config.headers) {
+      delete config.headers["Content-Type"];
+      delete config.headers["content-type"];
+    }
   } else {
-    config.headers["Content-Type"] = "application/json";
+    if (config.headers && typeof config.headers.set === "function") {
+      config.headers.set("Content-Type", "application/json");
+    } else if (config.headers) {
+      config.headers["Content-Type"] = "application/json";
+    }
   }
-  if (typeof window !== "undefined") {
+  if (typeof window !== "undefined" && config.headers) {
     const token = localStorage.getItem("ln_token");
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      if (typeof config.headers.set === "function") {
+        config.headers.set("Authorization", `Bearer ${token}`);
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
   }
   return config;
 });

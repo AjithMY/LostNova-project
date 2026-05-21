@@ -30,8 +30,12 @@ interface Pin {
   label: string;
 }
 
+const VIDEO_URL =
+  "https://res.cloudinary.com/df6oxyf0v/video/upload/v1779374421/WhatsApp_Video_2026-05-21_at_8.08.54_PM_tmwf8w.mp4";
+
 export default function CinematicHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -57,7 +61,7 @@ export default function CinematicHero() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Floating particles (tiny glowing dust + slow drift particles)
+    // Floating particles
     const particles: Particle[] = Array.from({ length: 65 }, (_, idx) => {
       const isDust = idx % 2 === 0;
       return {
@@ -71,14 +75,14 @@ export default function CinematicHero() {
       };
     });
 
-    // Holographic panels with sci-fi metadata
+    // Holographic panels
     const panels: HoloPanel[] = [
       { x: 0.58, y: 0.22, w: 170, h: 95, vy: 0.0001, a: 0, title: "GEMINI MATCHING", metric: "99.4% CONFIDENCE" },
       { x: 0.76, y: 0.40, w: 140, h: 75, vy: -0.00008, a: 0.3, title: "SYS.SCAN", metric: "RESOLVED: 78ms" },
       { x: 0.59, y: 0.60, w: 130, h: 65, vy: 0.00009, a: 0.6, title: "NETWORK SECURE", metric: "NODE-A2 ACTIVE" },
     ];
 
-    // Location pins with labels
+    // Location pins
     const pins: Pin[] = [
       { x: 0.53, y: 0.29, vy: 0, phase: 0, label: "LHR-AIRPORT" },
       { x: 0.78, y: 0.22, vy: 0, phase: 1.2, label: "NYC-SUBWAY" },
@@ -86,22 +90,17 @@ export default function CinematicHero() {
       { x: 0.49, y: 0.51, vy: 0, phase: 0.8, label: "BERLIN-METRO" },
     ];
 
-    const drawBackground = () => {
-      // Dark matte black environment
-      ctx.fillStyle = "#020204";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+    // NOTE: drawBackground is now canvas-only ambient glows (no solid fill)
+    // The video is the actual background behind the canvas.
+    const drawAmbientGlows = () => {
       const breathe = 0.85 + Math.sin(t * 0.0008) * 0.15;
 
       // Top glowing ambient highlight
       const topGlowX = canvas.width * (0.65 + Math.sin(t * 0.0005) * 0.08) + mouseSmooth.x * 0.15;
       const topGlowY = canvas.height * (0.25 + Math.cos(t * 0.0003) * 0.04) + mouseSmooth.y * 0.15;
-      const topGlow = ctx.createRadialGradient(
-        topGlowX, topGlowY, 0,
-        topGlowX, topGlowY, canvas.width * 0.45
-      );
-      topGlow.addColorStop(0, `rgba(0, 140, 255, ${0.08 * breathe})`);
-      topGlow.addColorStop(0.6, `rgba(0, 70, 180, ${0.02 * breathe})`);
+      const topGlow = ctx.createRadialGradient(topGlowX, topGlowY, 0, topGlowX, topGlowY, canvas.width * 0.45);
+      topGlow.addColorStop(0, `rgba(0, 140, 255, ${0.12 * breathe})`);
+      topGlow.addColorStop(0.6, `rgba(0, 70, 180, ${0.04 * breathe})`);
       topGlow.addColorStop(1, "transparent");
       ctx.fillStyle = topGlow;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -112,23 +111,32 @@ export default function CinematicHero() {
         canvas.width * 0.7, bottomGlowY, 0,
         canvas.width * 0.7, bottomGlowY, canvas.width * 0.35
       );
-      bottomGlow.addColorStop(0, `rgba(0, 80, 180, ${0.04 * breathe})`);
-      bottomGlow.addColorStop(0.5, `rgba(0, 40, 100, ${0.01 * breathe})`);
+      bottomGlow.addColorStop(0, `rgba(0, 80, 180, ${0.07 * breathe})`);
+      bottomGlow.addColorStop(0.5, `rgba(0, 40, 100, ${0.02 * breathe})`);
       bottomGlow.addColorStop(1, "transparent");
       ctx.fillStyle = bottomGlow;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Left side purple accent glow
+      const leftGlow = ctx.createRadialGradient(
+        canvas.width * 0.08 + mouseSmooth.x * 0.1, canvas.height * 0.5, 0,
+        canvas.width * 0.08, canvas.height * 0.5, canvas.width * 0.3
+      );
+      leftGlow.addColorStop(0, `rgba(80, 0, 200, ${0.06 * breathe})`);
+      leftGlow.addColorStop(1, "transparent");
+      ctx.fillStyle = leftGlow;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
 
     const drawVolumetricSpotlight = () => {
-      // Cinematic Unreal Engine spotlight beam sweeping down
       ctx.save();
       const breathe = 0.85 + Math.sin(t * 0.0007) * 0.15;
       const targetX = canvas.width * 0.675 + mouseSmooth.x * 0.4;
       const targetY = canvas.height * 0.68 + mouseSmooth.y * 0.4;
 
       const beamGlow = ctx.createLinearGradient(canvas.width * 0.85, -100, targetX, targetY);
-      beamGlow.addColorStop(0, `rgba(0, 160, 255, ${0.16 * breathe})`);
-      beamGlow.addColorStop(0.5, `rgba(0, 100, 220, ${0.06 * breathe})`);
+      beamGlow.addColorStop(0, `rgba(0, 160, 255, ${0.2 * breathe})`);
+      beamGlow.addColorStop(0.5, `rgba(0, 100, 220, ${0.08 * breathe})`);
       beamGlow.addColorStop(1, "rgba(0, 40, 150, 0)");
 
       ctx.beginPath();
@@ -146,7 +154,6 @@ export default function CinematicHero() {
       ctx.save();
       ctx.lineWidth = 1.2;
 
-      // Curve 1
       ctx.beginPath();
       const offset1 = Math.sin(t * 0.0002) * 35;
       ctx.moveTo(canvas.width * 0.35 + mouseSmooth.x * 0.1, -100);
@@ -158,12 +165,11 @@ export default function CinematicHero() {
       );
       const g1 = ctx.createLinearGradient(0, 0, 0, canvas.height);
       g1.addColorStop(0, "rgba(0, 120, 255, 0.0)");
-      g1.addColorStop(0.5, "rgba(0, 160, 255, 0.045)");
+      g1.addColorStop(0.5, "rgba(0, 160, 255, 0.055)");
       g1.addColorStop(1, "rgba(0, 80, 200, 0.0)");
       ctx.strokeStyle = g1;
       ctx.stroke();
 
-      // Curve 2
       ctx.beginPath();
       const offset2 = Math.cos(t * 0.00025) * 45;
       ctx.moveTo(canvas.width * 0.9 + mouseSmooth.x * 0.08, -100);
@@ -175,7 +181,7 @@ export default function CinematicHero() {
       );
       const g2 = ctx.createLinearGradient(0, 0, 0, canvas.height);
       g2.addColorStop(0, "rgba(0, 80, 200, 0.0)");
-      g2.addColorStop(0.4, "rgba(0, 180, 255, 0.03)");
+      g2.addColorStop(0.4, "rgba(0, 180, 255, 0.04)");
       g2.addColorStop(1, "rgba(0, 120, 255, 0.0)");
       ctx.strokeStyle = g2;
       ctx.stroke();
@@ -184,7 +190,7 @@ export default function CinematicHero() {
     };
 
     const drawGrid = () => {
-      ctx.strokeStyle = "rgba(0, 100, 255, 0.012)";
+      ctx.strokeStyle = "rgba(0, 100, 255, 0.018)";
       ctx.lineWidth = 1;
       const gs = 60;
       const ox = mouseSmooth.x * 0.05;
@@ -208,13 +214,10 @@ export default function CinematicHero() {
       for (let i = 0; i < 3; i++) {
         const rg = ctx.createRadialGradient(
           canvas.width * (0.45 + i * 0.15) + Math.sin(t * 0.0003 + i) * 12,
-          canvas.height * 0.9,
-          0,
-          canvas.width * (0.45 + i * 0.15),
-          canvas.height * 0.9,
-          canvas.width * 0.25
+          canvas.height * 0.9, 0,
+          canvas.width * (0.45 + i * 0.15), canvas.height * 0.9, canvas.width * 0.25
         );
-        rg.addColorStop(0, `rgba(0, 30, 80, ${0.04 - i * 0.009})`);
+        rg.addColorStop(0, `rgba(0, 30, 80, ${0.055 - i * 0.009})`);
         rg.addColorStop(1, "transparent");
         ctx.fillStyle = rg;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -227,14 +230,12 @@ export default function CinematicHero() {
       const rx = 180;
       const ry = 22;
 
-      // Platform bottom ambient shadow glow
       const pg = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx * 1.4);
       pg.addColorStop(0, `rgba(0, 120, 255, ${0.14 + Math.sin(t * 0.001) * 0.02})`);
       pg.addColorStop(1, "transparent");
       ctx.fillStyle = pg;
       ctx.fillRect(cx - rx * 2, cy - ry * 4, rx * 4, ry * 8);
 
-      // Matte dark platform tiers
       [[rx, ry], [rx * 0.78, ry * 0.75], [rx * 0.52, ry * 0.55]].forEach(([r, ry2], i) => {
         ctx.beginPath();
         ctx.ellipse(cx, cy - i * 11, r, ry2, 0, 0, Math.PI * 2);
@@ -245,12 +246,10 @@ export default function CinematicHero() {
         ctx.fillStyle = g;
         ctx.fill();
 
-        // Edge reflection highlight
         ctx.strokeStyle = `rgba(0, 150, 255, ${0.28 - i * 0.07})`;
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Specular glare on top tier
         if (i === 2) {
           ctx.beginPath();
           ctx.ellipse(cx - 30, cy - i * 11 - 2, r * 0.45, ry2 * 0.45, -0.2, 0, Math.PI * 2);
@@ -271,7 +270,6 @@ export default function CinematicHero() {
       ctx.save();
       ctx.translate(cx, cy);
 
-      // Volumetric shadow below
       const shadowScale = 1 - float / 25;
       const sg = ctx.createRadialGradient(0, 95 - float, 0, 0, 95 - float, 80 * shadowScale);
       sg.addColorStop(0, `rgba(0, 0, 0, ${0.4 * shadowScale})`);
@@ -279,7 +277,6 @@ export default function CinematicHero() {
       ctx.fillStyle = sg;
       ctx.fillRect(-90, 65 - float, 180, 60);
 
-      // Top handle strap
       ctx.beginPath();
       ctx.ellipse(0, -74, 18, 12, 0, Math.PI, 0);
       ctx.strokeStyle = "#171b22";
@@ -289,7 +286,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 7;
       ctx.stroke();
 
-      // Backpack body: Premium matte graphite curves
       ctx.beginPath();
       ctx.roundRect(-52, -70, 104, 130, 18);
       const bg = ctx.createLinearGradient(-52, -70, 52, 60);
@@ -299,7 +295,6 @@ export default function CinematicHero() {
       ctx.fillStyle = bg;
       ctx.fill();
 
-      // Micro-stitch dashes along the border
       ctx.save();
       ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
       ctx.lineWidth = 1;
@@ -309,7 +304,6 @@ export default function CinematicHero() {
       ctx.stroke();
       ctx.restore();
 
-      // Rim light glow
       ctx.beginPath();
       ctx.roundRect(-52, -70, 104, 130, 18);
       const rl = ctx.createLinearGradient(-52, 0, 52, 0);
@@ -320,7 +314,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Side mesh pockets
       [-56, 44].forEach((sx) => {
         ctx.beginPath();
         ctx.roundRect(sx, -10, 12, 45, 3);
@@ -328,16 +321,8 @@ export default function CinematicHero() {
         ctx.fill();
         ctx.strokeStyle = "rgba(0, 140, 255, 0.15)";
         ctx.stroke();
-        // Mesh pattern
-        ctx.save();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
-        ctx.lineWidth = 0.8;
-        ctx.setLineDash([2, 2]);
-        ctx.stroke();
-        ctx.restore();
       });
 
-      // Front pocket (rounded capsule style)
       ctx.beginPath();
       ctx.roundRect(-36, -18, 72, 58, 12);
       ctx.fillStyle = "#090c0f";
@@ -346,7 +331,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 1.2;
       ctx.stroke();
 
-      // Front pocket stitch
       ctx.save();
       ctx.strokeStyle = "rgba(0, 160, 255, 0.1)";
       ctx.setLineDash([2, 4]);
@@ -355,7 +339,6 @@ export default function CinematicHero() {
       ctx.stroke();
       ctx.restore();
 
-      // Zipper slider detail
       ctx.beginPath();
       ctx.roundRect(-6, -23, 12, 5, 1.5);
       ctx.fillStyle = "#2a313d";
@@ -363,7 +346,6 @@ export default function CinematicHero() {
       ctx.strokeStyle = "rgba(0, 180, 255, 0.4)";
       ctx.stroke();
 
-      // Shoulder harness straps
       [-28, 28].forEach((sx) => {
         ctx.beginPath();
         ctx.moveTo(sx, -70);
@@ -377,13 +359,11 @@ export default function CinematicHero() {
         ctx.stroke();
       });
 
-      // Lost & Found Tag (detailed lanyard connection)
       const ta = Math.sin(t * 0.0006) * 0.08;
       ctx.save();
       ctx.translate(22, -50);
       ctx.rotate(ta);
 
-      // Strap link
       ctx.beginPath();
       ctx.moveTo(-2, -30);
       ctx.lineTo(-2, -24);
@@ -391,7 +371,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 1.8;
       ctx.stroke();
 
-      // Tag body
       ctx.beginPath();
       ctx.roundRect(-18, -24, 36, 44, 6);
       ctx.fillStyle = "#07090c";
@@ -400,26 +379,22 @@ export default function CinematicHero() {
       ctx.lineWidth = 1.2;
       ctx.stroke();
 
-      // Tech details on tag
       ctx.fillStyle = "rgba(0, 160, 255, 0.25)";
       ctx.fillRect(-12, -18, 8, 1.5);
       ctx.fillRect(-12, -14, 24, 0.85);
 
-      // Tag text
       ctx.fillStyle = "#a2dbff";
       ctx.font = "bold 6.5px 'Inter', sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("LOST &", 0, -3);
       ctx.fillText("FOUND", 0, 7);
 
-      // QR / Barcode indicator
       ctx.fillStyle = "rgba(0, 180, 255, 0.4)";
       for (let bi = 0; bi < 5; bi++) {
         ctx.fillRect(-10 + bi * 4, 14, bi % 2 === 0 ? 2 : 1, 4);
       }
       ctx.restore();
 
-      // Ambient reflection aura
       const aura = ctx.createRadialGradient(0, 0, 45, 0, 0, 115);
       aura.addColorStop(0, "transparent");
       aura.addColorStop(1, `rgba(0, 100, 255, ${0.06 + Math.sin(t * 0.001) * 0.025})`);
@@ -438,7 +413,6 @@ export default function CinematicHero() {
       ctx.translate(cx, cy);
       ctx.rotate(0.04);
 
-      // Matte dark phone chassis (flat edge iPhone style)
       ctx.beginPath();
       ctx.roundRect(-16, -42, 32, 68, 8);
       const g = ctx.createLinearGradient(-16, -42, 16, 26);
@@ -450,12 +424,10 @@ export default function CinematicHero() {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Side volume buttons
       ctx.fillStyle = "#2c3342";
       ctx.fillRect(-18, -25, 2, 8);
       ctx.fillRect(-18, -14, 2, 8);
 
-      // Screen soft glow
       ctx.beginPath();
       ctx.roundRect(-13.5, -39.5, 27, 63, 6);
       const sg = ctx.createLinearGradient(-13.5, -39.5, 13.5, 23.5);
@@ -465,13 +437,11 @@ export default function CinematicHero() {
       ctx.fillStyle = sg;
       ctx.fill();
 
-      // Dynamic Island notch
       ctx.beginPath();
       ctx.roundRect(-5, -36, 10, 2.8, 1.4);
       ctx.fillStyle = "#06070a";
       ctx.fill();
 
-      // Glowing route/map graphic on screen
       ctx.strokeStyle = "rgba(0, 240, 255, 0.35)";
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -485,7 +455,6 @@ export default function CinematicHero() {
       ctx.fillStyle = "#ffffff";
       ctx.fill();
 
-      // Specular sweep across the glass screen
       const sweep = Math.sin(t * 0.008) * 45;
       ctx.save();
       ctx.beginPath();
@@ -513,7 +482,6 @@ export default function CinematicHero() {
       ctx.translate(cx, cy);
       ctx.rotate(-0.06);
 
-      // Wallet body
       ctx.beginPath();
       ctx.roundRect(-32, -15, 64, 30, 6);
       const g = ctx.createLinearGradient(-32, -15, 32, 15);
@@ -525,7 +493,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 1.2;
       ctx.stroke();
 
-      // Stitching around wallet edge
       ctx.save();
       ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
       ctx.lineWidth = 0.85;
@@ -535,7 +502,6 @@ export default function CinematicHero() {
       ctx.stroke();
       ctx.restore();
 
-      // Pocket division line
       ctx.beginPath();
       ctx.moveTo(-32, -1);
       ctx.lineTo(32, -1);
@@ -543,7 +509,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Silver brand logo inlay
       ctx.beginPath();
       ctx.moveTo(-18, -8);
       ctx.lineTo(-14, -8);
@@ -552,7 +517,6 @@ export default function CinematicHero() {
       ctx.fillStyle = "rgba(0, 180, 255, 0.55)";
       ctx.fill();
 
-      // Protruding credit card slots (gold contacts)
       ctx.beginPath();
       ctx.roundRect(10, -9, 17, 15, 1.5);
       ctx.fillStyle = "rgba(0, 160, 255, 0.14)";
@@ -560,7 +524,6 @@ export default function CinematicHero() {
       ctx.strokeStyle = "rgba(0, 160, 255, 0.35)";
       ctx.stroke();
 
-      // Tiny metallic chip lines
       ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
       ctx.fillRect(15, -6, 4, 3);
 
@@ -575,20 +538,17 @@ export default function CinematicHero() {
       ctx.save();
       ctx.translate(cx, cy);
 
-      // Double metal split-ring
       ctx.beginPath();
       ctx.arc(0, 0, 10, 0, Math.PI * 2);
       ctx.strokeStyle = "rgba(0, 150, 255, 0.5)";
       ctx.lineWidth = 2.2;
       ctx.stroke();
 
-      // Subtly floating keys
       [-0.4, 0.2, 0.8].forEach((a, i) => {
         ctx.save();
         ctx.rotate(a + Math.sin(t * 0.0005 + i) * 0.02);
 
         if (i === 1) {
-          // Modern car key fob instead of standard key
           ctx.beginPath();
           ctx.roundRect(8, -8, 22, 16, 4);
           ctx.fillStyle = "#11141a";
@@ -597,18 +557,15 @@ export default function CinematicHero() {
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          // Buttons
           ctx.fillStyle = "rgba(0, 200, 255, 0.35)";
           ctx.fillRect(13, -4, 4, 3);
           ctx.fillRect(20, -4, 4, 3);
 
-          // LED indicator
           ctx.beginPath();
           ctx.arc(26, 4, 1.2, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(0, 255, 255, ${0.4 + Math.sin(t * 0.003) * 0.3})`;
           ctx.fill();
         } else {
-          // standard key shaft with notches
           ctx.beginPath();
           ctx.moveTo(8, 0);
           ctx.lineTo(36, 0);
@@ -617,7 +574,6 @@ export default function CinematicHero() {
           ctx.lineCap = "round";
           ctx.stroke();
 
-          // teeth notches
           ctx.beginPath();
           ctx.moveTo(24, 1.4);
           ctx.lineTo(24, 4.5);
@@ -629,7 +585,6 @@ export default function CinematicHero() {
           ctx.lineWidth = 1.8;
           ctx.stroke();
 
-          // Key bow loop
           ctx.beginPath();
           ctx.roundRect(31, -5, 10, 10, 2);
           ctx.strokeStyle = "rgba(0, 140, 255, 0.35)";
@@ -650,14 +605,12 @@ export default function CinematicHero() {
       ctx.translate(cx, cy);
       ctx.rotate(0.12 + Math.sin(t * 0.0005) * 0.02);
 
-      // Soft shadow
       const sg = ctx.createRadialGradient(0, 22 - float, 0, 0, 22 - float, 28);
       sg.addColorStop(0, "rgba(0,0,0,0.4)");
       sg.addColorStop(1, "transparent");
       ctx.fillStyle = sg;
       ctx.fillRect(-22, 12 - float, 44, 15);
 
-      // Card body
       ctx.beginPath();
       ctx.roundRect(-22, -14, 44, 28, 4);
       const g = ctx.createLinearGradient(-22, -14, 22, 14);
@@ -670,19 +623,16 @@ export default function CinematicHero() {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Top slot for clip
       ctx.beginPath();
       ctx.roundRect(-6, -12, 12, 1.8, 0.8);
       ctx.fillStyle = "#0c0d10";
       ctx.fill();
 
-      // Neon blue header strip
       ctx.beginPath();
       ctx.roundRect(-22, -14, 44, 5, [4, 4, 0, 0]);
       ctx.fillStyle = "rgba(0, 120, 255, 0.38)";
       ctx.fill();
 
-      // Photo slot
       ctx.beginPath();
       ctx.roundRect(-16, -4, 9, 11, 1);
       ctx.fillStyle = "#151820";
@@ -690,7 +640,6 @@ export default function CinematicHero() {
       ctx.strokeStyle = "rgba(0, 140, 255, 0.25)";
       ctx.stroke();
 
-      // Avatar silhouette inside photo
       ctx.beginPath();
       ctx.arc(-11.5, -1, 2, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(0, 190, 255, 0.35)";
@@ -699,14 +648,11 @@ export default function CinematicHero() {
       ctx.arc(-11.5, 4.5, 3.5, Math.PI, 0);
       ctx.fill();
 
-      // Detailed text metadata lines
       ctx.fillStyle = "rgba(0, 160, 255, 0.28)";
       ctx.fillRect(-3, -4, 16, 1.2);
       ctx.fillRect(-3, 0, 12, 1.2);
       ctx.fillRect(-3, 4, 9, 1.2);
 
-      // Holographic Security Badge with interactive color shifting
-      const colorPhase = Math.sin(t * 0.0015);
       ctx.beginPath();
       ctx.roundRect(11.5, 6.5, 7, 6, 1.5);
       const badgeGlow = ctx.createLinearGradient(11.5, 6.5, 18.5, 12.5);
@@ -718,7 +664,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 0.8;
       ctx.stroke();
 
-      // Tiny barcode
       ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
       for (let bi = 0; bi < 6; bi++) {
         ctx.fillRect(-18 + bi * 2.5, 9, bi % 2 === 0 ? 1 : 0.5, 2.5);
@@ -736,14 +681,12 @@ export default function CinematicHero() {
       ctx.translate(cx, cy);
       ctx.rotate(-0.08 + Math.sin(t * 0.0006) * 0.02);
 
-      // Shadow below smartwatch
       const sg = ctx.createRadialGradient(0, 20 - float, 0, 0, 20 - float, 24);
       sg.addColorStop(0, "rgba(0,0,0,0.35)");
       sg.addColorStop(1, "transparent");
       ctx.fillStyle = sg;
       ctx.fillRect(-15, 12 - float, 30, 12);
 
-      // Detailed mesh watch strap
       ctx.beginPath();
       ctx.roundRect(-8, -24, 16, 48, 4);
       ctx.fillStyle = "#14171d";
@@ -752,7 +695,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Watch strap mesh texture lines
       ctx.save();
       ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
       ctx.lineWidth = 0.5;
@@ -764,7 +706,6 @@ export default function CinematicHero() {
       }
       ctx.restore();
 
-      // Smartwatch dial body (matte charcoal rounded rectangle)
       ctx.beginPath();
       ctx.roundRect(-13, -16, 26, 32, 6);
       const g = ctx.createLinearGradient(-13, -16, 13, 16);
@@ -777,11 +718,9 @@ export default function CinematicHero() {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Side Dial Crown
       ctx.fillStyle = "#2c313d";
       ctx.fillRect(13, -4, 2, 7);
 
-      // Display screen (neon blue glowing circular area)
       ctx.beginPath();
       ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
       const screenGlow = ctx.createRadialGradient(-2, -2, 0, 0, 0, 9.5);
@@ -793,7 +732,6 @@ export default function CinematicHero() {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Glowing heart rate sweep UI detail inside watch
       ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -818,7 +756,6 @@ export default function CinematicHero() {
         ctx.save();
         ctx.globalAlpha = alpha;
 
-        // Glassmorphic panel background
         ctx.beginPath();
         ctx.roundRect(x, y, p.w, p.h, 10);
         const g = ctx.createLinearGradient(x, y, x + p.w, y + p.h);
@@ -827,30 +764,23 @@ export default function CinematicHero() {
         ctx.fillStyle = g;
         ctx.fill();
 
-        // Neon outline border
         ctx.strokeStyle = `rgba(0, 170, 255, ${0.38 + Math.sin(t2 + i) * 0.08})`;
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Corner brackets / brackets design
         ctx.strokeStyle = "rgba(0, 230, 255, 0.6)";
         ctx.lineWidth = 1.5;
-        // Top-left corner
         ctx.beginPath(); ctx.moveTo(x + 8, y); ctx.lineTo(x, y); ctx.lineTo(x, y + 8); ctx.stroke();
-        // Bottom-right corner
         ctx.beginPath(); ctx.moveTo(x + p.w - 8, y + p.h); ctx.lineTo(x + p.w, y + p.h); ctx.lineTo(x + p.w, y + p.h - 8); ctx.stroke();
 
-        // Sci-fi Title
         ctx.fillStyle = "rgba(165, 231, 255, 0.9)";
         ctx.font = "900 8.5px 'Inter', sans-serif";
         ctx.fillText(p.title, x + 12, y + 18);
 
-        // Sci-fi Metric / Subtitle
         ctx.fillStyle = "rgba(0, 220, 255, 0.6)";
         ctx.font = "600 7px 'Inter', sans-serif";
         ctx.fillText(p.metric, x + 12, y + 30);
 
-        // Technical data bars
         ctx.strokeStyle = "rgba(0, 160, 255, 0.15)";
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -858,7 +788,6 @@ export default function CinematicHero() {
         ctx.lineTo(x + p.w - 12, y + 42);
         ctx.stroke();
 
-        // Live grid graph visualization
         const graphW = p.w - 24;
         const graphH = 20;
         const graphY = y + 52;
@@ -867,15 +796,11 @@ export default function CinematicHero() {
         ctx.beginPath();
         for (let gx = 0; gx < graphW; gx += 4) {
           const gy = Math.sin(t * 0.04 + gx * 0.2 + i * 4) * (graphH * 0.35);
-          if (gx === 0) {
-            ctx.moveTo(x + 12 + gx, graphY + gy);
-          } else {
-            ctx.lineTo(x + 12 + gx, graphY + gy);
-          }
+          if (gx === 0) ctx.moveTo(x + 12 + gx, graphY + gy);
+          else ctx.lineTo(x + 12 + gx, graphY + gy);
         }
         ctx.stroke();
 
-        // Technical status label
         ctx.fillStyle = "rgba(0, 240, 255, 0.4)";
         ctx.font = "bold 6.5px 'Inter', sans-serif";
         ctx.fillText("SYS.LOC: ENG-A3", x + 12, y + p.h - 8);
@@ -894,7 +819,6 @@ export default function CinematicHero() {
 
         ctx.save();
 
-        // 1. Volumetric laser beam rising up to sky
         const beamGlow = ctx.createLinearGradient(x, y, x, y - 110);
         beamGlow.addColorStop(0, "rgba(0, 160, 255, 0.28)");
         beamGlow.addColorStop(0.5, "rgba(0, 110, 230, 0.08)");
@@ -909,14 +833,12 @@ export default function CinematicHero() {
         ctx.translate(x, y);
         ctx.scale(s, s);
 
-        // Pulse ring
         ctx.beginPath();
         ctx.arc(0, 10, 15 + pulse * 6, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(0, 170, 255, ${0.08 + pulse * 0.08})`;
         ctx.lineWidth = 1.2;
         ctx.stroke();
 
-        // Pin body
         ctx.beginPath();
         ctx.arc(0, 0, 11, 0, Math.PI * 2);
         const g = ctx.createRadialGradient(-3, -3, 0, 0, 0, 11);
@@ -928,7 +850,6 @@ export default function CinematicHero() {
         ctx.lineWidth = 1.2;
         ctx.stroke();
 
-        // Pin tip pointing down
         ctx.beginPath();
         ctx.moveTo(-5, 7);
         ctx.lineTo(5, 7);
@@ -937,19 +858,16 @@ export default function CinematicHero() {
         ctx.fillStyle = "rgba(0, 130, 230, 0.75)";
         ctx.fill();
 
-        // Inner white core dot
         ctx.beginPath();
         ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
         ctx.fillStyle = "#fff";
         ctx.fill();
 
-        // Glowing text label floating above the pin
         ctx.fillStyle = "rgba(160, 210, 255, 0.75)";
         ctx.font = "bold 8.5px 'Inter', sans-serif";
         ctx.textAlign = "center";
         ctx.fillText(p.label, 0, -18);
 
-        // Glow aura rectangle
         const gl = ctx.createRadialGradient(0, 0, 0, 0, 0, 20);
         gl.addColorStop(0, `rgba(0, 170, 255, ${0.28 + pulse * 0.15})`);
         gl.addColorStop(1, "transparent");
@@ -1008,14 +926,13 @@ export default function CinematicHero() {
 
     const frame = () => {
       t++;
-
-      // Parallax smooth interpolation
       mouseSmooth.x += (mouse.x * 20 - mouseSmooth.x) * 0.035;
       mouseSmooth.y += (mouse.y * 20 - mouseSmooth.y) * 0.035;
 
+      // Clear canvas fully transparent — video shows through
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      drawBackground();
+      drawAmbientGlows();
       drawVolumetricSpotlight();
       drawAbstractCurves();
       drawGrid();
@@ -1045,15 +962,103 @@ export default function CinematicHero() {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
       style={{
         position: "absolute",
         inset: 0,
         width: "100%",
         height: "100%",
-        display: "block",
+        overflow: "hidden",
       }}
-    />
+    >
+      {/* ── Layer 1: Fullscreen video background ── */}
+      <video
+        ref={videoRef}
+        src={VIDEO_URL}
+        autoPlay
+        muted
+        loop
+        playsInline
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center",
+          zIndex: 0,
+        }}
+      />
+
+      {/* ── Layer 2: Cinematic dark overlay (multi-stop for depth) ── */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          background: [
+            /* base dark tint */ "rgba(0, 2, 8, 0.62)",
+          ].join(", "),
+        }}
+      />
+
+      {/* ── Layer 3: Left-side content readability vignette ── */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 2,
+          background:
+            "radial-gradient(ellipse 70% 100% at 25% 50%, rgba(0,2,14,0.72) 0%, transparent 75%)",
+        }}
+      />
+
+      {/* ── Layer 4: Bottom depth vignette ── */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 3,
+          background:
+            "linear-gradient(to top, rgba(0,0,10,0.85) 0%, transparent 35%)",
+        }}
+      />
+
+      {/* ── Layer 5: Top edge vignette ── */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 4,
+          background:
+            "linear-gradient(to bottom, rgba(0,0,8,0.55) 0%, transparent 20%)",
+        }}
+      />
+
+      {/* ── Layer 6: Neon blue ambient tint (blends video into theme) ── */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 5,
+          background:
+            "radial-gradient(ellipse 80% 60% at 70% 40%, rgba(0, 60, 180, 0.18) 0%, transparent 70%)",
+          mixBlendMode: "screen",
+        }}
+      />
+
+      {/* ── Layer 7: Canvas holographic effects overlay ── */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          display: "block",
+          zIndex: 6,
+        }}
+      />
+    </div>
   );
 }
